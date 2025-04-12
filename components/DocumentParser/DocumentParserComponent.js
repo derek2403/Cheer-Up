@@ -31,10 +31,12 @@ export function DocumentParserComponent() {
     },
     onDropRejected: () => {
       setError('Please upload a supported file type (PDF, JPG, PNG, TXT, DOC, DOCX)');
-    }
+    },
+    disabled: parsing
   });
 
-  const handleParse = async () => {
+  const handleParse = async (e) => {
+    e.stopPropagation();
     if (!file) return;
 
     setParsing(true);
@@ -92,8 +94,8 @@ export function DocumentParserComponent() {
 
   return (
     <div className="parser-container">
-      <div {...getRootProps()} className="dropzone">
-        <input {...getInputProps()} />
+      <div {...getRootProps()} className={`dropzone ${parsing ? 'processing' : ''}`}>
+        <input {...getInputProps()} disabled={parsing} />
         <div className="dropzone-content">
           {file ? (
             <>
@@ -145,9 +147,10 @@ export function DocumentParserComponent() {
           background: rgba(79, 70, 229, 0.05);
         }
 
-        .dropzone:hover {
-          border-color: #6366f1;
-          background: rgba(79, 70, 229, 0.1);
+        .dropzone.processing {
+          cursor: not-allowed;
+          opacity: 0.7;
+          pointer-events: none;
         }
 
         .dropzone-content {
