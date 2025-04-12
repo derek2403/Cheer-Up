@@ -7,7 +7,7 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.headerContainer}>
         <div className={styles.logo}>
-          <Link href="/">Cure me baby</Link>
+          <Link href="/">BuidlAI</Link>
         </div>
         
         <nav className={styles.navigation}>
