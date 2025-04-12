@@ -34,15 +34,12 @@
     "openai": "^4.93.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-<<<<<<< HEAD
-    "three": "^0.175.0"
-=======
+    "three": "^0.175.0",
 
     "viem": "^2.26.3",
-    "wagmi": "^2.14.16"
+    "wagmi": "^2.14.16",
 
     "react-dropzone": "^14.3.8"
->>>>>>> 236f13e55fc5e0e4d04fd571179577448ac12080
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
