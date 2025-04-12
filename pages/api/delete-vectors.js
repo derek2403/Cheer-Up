@@ -1,4 +1,4 @@
-import { Pinecone } from '@pinecone-database/pinecone';
+import qdrantClient from '../../utils/qdrantClient';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,48 +6,56 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Initialize Pinecone
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY,
-    });
-
-    const index = pc.index(process.env.PINECONE_INDEX_NAME);
+    // Initialize Qdrant collection
+    await qdrantClient.initCollection();
     
     try {
-      // Try to delete all vectors
-      await index.deleteAll();
-    } catch (deleteError) {
-      // If there are no vectors (404 error), consider it a success
-      if (deleteError.message && deleteError.message.includes('404')) {
+      // Try to delete all vectors by recreating the collection
+      const client = qdrantClient.client;
+      const collectionName = qdrantClient.collectionName;
+      
+      // First check if the collection exists
+      const collections = await client.getCollections();
+      const collectionExists = collections.collections.some(
+        collection => collection.name === collectionName
+      );
+      
+      if (collectionExists) {
+        // Delete the existing collection
+        await client.deleteCollection(collectionName);
+        
+        // Recreate the collection with the same settings
+        await client.createCollection(collectionName, {
+          vectors: { 
+            size: qdrantClient.vectorDimension, 
+            distance: "Cosine" 
+          },
+          optimizers_config: {
+            indexing_threshold: 0,
+          },
+        });
+        
         return res.status(200).json({
           success: true,
-          message: 'All vectors have already been cleared',
+          message: 'All vectors deleted successfully by recreating collection',
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: 'Collection does not exist, nothing to delete',
         });
       }
-      // For other errors, throw them to be caught by the outer try-catch
+    } catch (deleteError) {
+      console.error('Error deleting collection:', deleteError);
       throw deleteError;
     }
-    
-    // Wait briefly for deletion to complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Get index stats to confirm deletion
-    const stats = await index.describeIndexStats();
-    
-    return res.status(200).json({
-      success: true,
-      message: 'All vectors deleted successfully',
-      indexStats: stats
-    });
   } catch (error) {
-    // Only log errors that aren't related to 404 (no vectors)
-    if (!error.message || !error.message.includes('404')) {
-      console.error('Error deleting vectors:', error);
-    }
+    console.error('Error deleting vectors:', error);
     
-    return res.status(200).json({
-      success: true,
-      message: 'Vector state cleared',
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete vectors',
+      error: error.message
     });
   }
 } 

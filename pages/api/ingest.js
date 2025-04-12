@@ -1,6 +1,7 @@
 import { parse } from 'node-html-parser';
-import { Pinecone } from '@pinecone-database/pinecone';
 import fetch from 'node-fetch';
+import qdrantClient from '../../utils/qdrantClient';
+import crypto from 'crypto';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -106,43 +107,44 @@ export default async function handler(req, res) {
       allEmbeddings.push(...data.data);
     }
 
-    // Initialize Pinecone with the correct configuration
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY,
-    });
-
-    // Get the index instance
-    const index = pc.index(process.env.PINECONE_INDEX_NAME);
+    // Initialize Qdrant collection
+    await qdrantClient.initCollection();
 
     // Prepare vectors with improved metadata
-    const vectors = allEmbeddings.map((embedding, idx) => ({
-      id: `${documentId}_${idx}`,
-      values: embedding.embedding,
-      metadata: {
-        text: chunks[idx].text,
-        tag: chunks[idx].tag,
-        documentId,
-        chunkIndex: idx,
-        timestamp: new Date().toISOString()
-      }
-    }));
+    const vectors = allEmbeddings.map((embedding, idx) => {
+      // Generate a UUID-like ID for each vector
+      const id = crypto.createHash('md5').update(`${documentId}_${idx}`).digest('hex');
+      
+      return {
+        id: id,
+        vector: embedding.embedding,
+        payload: {
+          text: chunks[idx].text,
+          tag: chunks[idx].tag,
+          doc_id: documentId,
+          chunk_index: idx,
+          timestamp: new Date().toISOString()
+        }
+      };
+    });
 
-    // Upsert vectors to Pinecone in batches
+    // Initialize upsert results
+    let upsertResults = [];
+
+    // Upsert vectors to Qdrant in batches
     for (let i = 0; i < vectors.length; i += batchSize) {
       const batchVectors = vectors.slice(i, i + batchSize);
-      await index.upsert(batchVectors);
+      const result = await qdrantClient.upsertVectors(batchVectors);
+      upsertResults.push(result);
     }
 
     // Wait briefly for eventual consistency
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Get index stats to confirm upsert
-    const stats = await index.describeIndexStats();
-
     return res.status(200).json({ 
       success: true, 
       chunksProcessed: chunks.length,
-      indexStats: stats
+      results: upsertResults
     });
   } catch (error) {
     console.error('Error ingesting document:', error);

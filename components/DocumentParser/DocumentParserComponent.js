@@ -1,85 +1,218 @@
 import { useState } from 'react';
-import { FileUpload } from './FileUpload';
-import { OutputSection } from './OutputSection';
-import { LoadingIndicator } from './LoadingIndicator';
+import { useDropzone } from 'react-dropzone';
 
-export const DocumentParserComponent = () => {
+export function DocumentParserComponent() {
   const [file, setFile] = useState(null);
-  const [fileError, setFileError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [parsedData, setParsedData] = useState(null);
+  const [parsing, setParsing] = useState(false);
+  const [sections, setSections] = useState({
+    htmlOutput: '',
+    rawHtml: '',
+    textOutput: ''
+  });
+  const [error, setError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    
-    if (!selectedFile) {
-      setFile(null);
-      return;
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'application/pdf': ['.pdf'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+      'text/plain': ['.txt'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+    },
+    maxFiles: 1,
+    onDrop: acceptedFiles => {
+      if (acceptedFiles.length > 0) {
+        setFile(acceptedFiles[0]);
+        setError('');
+        setUploadSuccess(false);
+      }
+    },
+    onDropRejected: () => {
+      setError('Please upload a supported file type (PDF, JPG, PNG, TXT, DOC, DOCX)');
     }
+  });
 
-    const validTypes = ['application/pdf', 'image/png', 'image/jpeg'];
-    
-    if (!validTypes.includes(selectedFile.type)) {
-      setFileError('Please upload a PDF, PNG, or JPG file');
-      setFile(null);
-      return;
-    }
-    
-    setFileError('');
-    setFile(selectedFile);
-  };
+  const handleParse = async () => {
+    if (!file) return;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    setParsing(true);
+    setError('');
     
-    if (!file) {
-      setFileError('Please select a file to upload');
-      return;
-    }
+    const formData = new FormData();
+    formData.append('file', file);
 
-    setIsLoading(true);
-    setParsedData(null);
-    setFileError('');
-    
     try {
-      const formData = new FormData();
-      formData.append('document', file);
-      
-      const response = await fetch('/api/parse', {
+      // First parse the document
+      const parseResponse = await fetch('/api/parse', {
         method: 'POST',
         body: formData,
       });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to parse document');
+
+      if (!parseResponse.ok) {
+        throw new Error('Failed to parse document');
       }
+
+      const parseData = await parseResponse.json();
+
+      // Then ingest the parsed content
+      const ingestResponse = await fetch('/api/ingest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documentId: file.name,
+          htmlContent: parseData.htmlOutput
+        }),
+      });
+
+      if (!ingestResponse.ok) {
+        throw new Error('Failed to process document');
+      }
+
+      setSections({
+        htmlOutput: parseData.htmlOutput,
+        rawHtml: parseData.rawHtml,
+        textOutput: parseData.textOutput
+      });
       
-      setParsedData(data);
-    } catch (error) {
-      console.error('Error:', error);
-      setFileError(error.message);
+      setUploadSuccess(true);
+      setFile(null); // Reset file selection after successful upload
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Failed to process document. Please try again.');
     } finally {
-      setIsLoading(false);
+      setParsing(false);
     }
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Document Parser</h1>
-      
-      <FileUpload
-        file={file}
-        fileError={fileError}
-        isLoading={isLoading}
-        onFileChange={handleFileChange}
-        onSubmit={handleSubmit}
-      />
+    <div className="parser-container">
+      <div {...getRootProps()} className="dropzone">
+        <input {...getInputProps()} />
+        <div className="dropzone-content">
+          {file ? (
+            <>
+              <p className="file-name">{file.name}</p>
+              <button 
+                onClick={handleParse}
+                disabled={parsing}
+                className="parse-button"
+              >
+                {parsing ? 'Processing...' : 'Process Document'}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="upload-icon">📄</div>
+              <p className="upload-text">Drop your document here or click to browse</p>
+              <p className="supported-formats">
+                Supported formats: PDF, JPG, PNG, TXT, DOC, DOCX
+              </p>
+            </>
+          )}
+        </div>
+      </div>
 
-      {isLoading && <LoadingIndicator />}
-      
-      <OutputSection parsedData={parsedData} />
+      {error && (
+        <div className="error-message">
+          ❌ {error}
+        </div>
+      )}
+
+      {uploadSuccess && (
+        <div className="success-message">
+          ✅ Document processed successfully! I'll use this information to provide more personalized support.
+        </div>
+      )}
+
+      <style jsx>{`
+        .parser-container {
+          width: 100%;
+        }
+
+        .dropzone {
+          border: 2px dashed #4f46e5;
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: rgba(79, 70, 229, 0.05);
+        }
+
+        .dropzone:hover {
+          border-color: #6366f1;
+          background: rgba(79, 70, 229, 0.1);
+        }
+
+        .dropzone-content {
+          padding: 20px;
+        }
+
+        .upload-icon {
+          font-size: 48px;
+          margin-bottom: 16px;
+        }
+
+        .upload-text {
+          font-size: 16px;
+          color: #e2e8f0;
+          margin-bottom: 8px;
+        }
+
+        .supported-formats {
+          font-size: 14px;
+          color: #64748b;
+        }
+
+        .file-name {
+          font-size: 16px;
+          color: #a5b4fc;
+          margin-bottom: 16px;
+          word-break: break-all;
+        }
+
+        .parse-button {
+          background: #4f46e5;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+
+        .parse-button:hover:not(:disabled) {
+          background: #4338ca;
+        }
+
+        .parse-button:disabled {
+          background: #6b7280;
+          cursor: not-allowed;
+        }
+
+        .error-message {
+          margin-top: 16px;
+          padding: 12px;
+          background: rgba(239, 68, 68, 0.1);
+          border-left: 3px solid #ef4444;
+          color: #fca5a5;
+          border-radius: 4px;
+        }
+
+        .success-message {
+          margin-top: 16px;
+          padding: 12px;
+          background: rgba(34, 197, 94, 0.1);
+          border-left: 3px solid #22c55e;
+          color: #86efac;
+          border-radius: 4px;
+        }
+      `}</style>
     </div>
   );
-}; 
+} 

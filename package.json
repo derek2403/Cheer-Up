@@ -11,6 +11,8 @@
   "dependencies": {
     "@heroui/react": "^2.7.6",
     "@pinecone-database/pinecone": "^5.1.1",
+    "@qdrant/js-client-rest": "^1.13.0",
+    "dotenv": "^16.5.0",
     "form-data": "^4.0.2",
     "formidable": "^3.5.2",
     "framer-motion": "^11.9.0",
@@ -19,7 +21,8 @@
     "node-html-parser": "^7.0.1",
     "openai": "^4.93.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -111,7 +111,7 @@ export default function DocumentChatPage() {
             onClick={handleClearVectors}
             className="header-button clear-button"
           >
-            Reset Vectors
+            Reset Memory
           </button>
           <Link href="/">
             <button className="header-button home-button">
@@ -121,16 +121,34 @@ export default function DocumentChatPage() {
         </div>
 
         <div className="document-parser-section">
+          <div className="parser-intro">
+            <h2>Share Your Context</h2>
+            <p className="intro-text">
+              Upload personal documents that can help me understand you better:
+            </p>
+            <ul className="document-suggestions">
+              <li>📝 Journal entries or personal reflections</li>
+              <li>📋 Medical or therapy history (if comfortable sharing)</li>
+              <li>📄 Important life events or experiences</li>
+              <li>✍️ Personal goals or aspirations</li>
+              <li>🗂️ Any other documents relevant to your journey</li>
+            </ul>
+            <p className="privacy-note">
+              Your documents are processed securely and used only to provide more personalized support.
+            </p>
+          </div>
           <DocumentParserComponent />
         </div>
         
         <div className="chatbot-section">
-          <h2>Therapeutic Conversation Space</h2>
+          <h2>Your Therapeutic Space</h2>
           
           <div className="chat-container">
             {messages.length === 0 ? (
               <div className="empty-state">
-                Share what's on your mind or what you'd like support with today
+                <p>Welcome to your safe space for conversation and support.</p>
+                <p>Feel free to share what's on your mind, your feelings, or any specific concerns you'd like to discuss.</p>
+                <p className="tip">Tip: Upload relevant documents above to help me provide more personalized support.</p>
               </div>
             ) : (
               <div className="messages">
@@ -203,7 +221,7 @@ export default function DocumentChatPage() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Express your thoughts or feelings here..."
+              placeholder="Share your thoughts, feelings, or concerns..."
               disabled={loading}
             />
             <button type="submit" disabled={loading || !query.trim()}>
@@ -295,11 +313,57 @@ export default function DocumentChatPage() {
           scroll-behavior: smooth;
         }
         
+        .parser-intro {
+          margin-bottom: 24px;
+          color: #e2e8f0;
+        }
+
+        .intro-text {
+          font-size: 16px;
+          margin: 12px 0;
+          color: #94a3b8;
+        }
+
+        .document-suggestions {
+          list-style: none;
+          padding: 0;
+          margin: 16px 0;
+        }
+
+        .document-suggestions li {
+          margin: 8px 0;
+          padding: 8px 12px;
+          background: rgba(79, 70, 229, 0.1);
+          border-radius: 6px;
+          font-size: 15px;
+          color: #a5b4fc;
+        }
+
+        .privacy-note {
+          font-size: 14px;
+          color: #64748b;
+          font-style: italic;
+          margin-top: 16px;
+          padding: 8px;
+          border-left: 3px solid #4f46e5;
+        }
+
         .empty-state {
           color: #94a3b8;
           text-align: center;
-          padding: 40px 0;
+          padding: 40px 20px;
+        }
+
+        .empty-state p {
+          margin: 12px 0;
+          line-height: 1.6;
+        }
+
+        .empty-state .tip {
+          margin-top: 24px;
           font-style: italic;
+          color: #64748b;
+          font-size: 14px;
         }
         
         .messages {

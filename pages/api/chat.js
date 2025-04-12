@@ -1,6 +1,6 @@
-import { Pinecone } from '@pinecone-database/pinecone';
 import fetch from 'node-fetch';
 import OpenAI from 'openai';
+import qdrantClient from '../../utils/qdrantClient';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -35,23 +35,16 @@ export default async function handler(req, res) {
     const embeddingData = await embeddingResponse.json();
     const queryEmbedding = embeddingData.data[0].embedding;
 
-    // 2. Query Pinecone for similar documents with higher topK for better context
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY,
-    });
-
-    const index = pc.index(process.env.PINECONE_INDEX_NAME);
+    // 2. Initialize Qdrant collection if needed
+    await qdrantClient.initCollection();
     
-    const queryResult = await index.query({
-      vector: queryEmbedding,
-      topK: 15, // 10 to 15 for better context
-      includeMetadata: true
-    });
-
-    // 3. Process and organize the retrieved chunks
-    const contextChunks = queryResult.matches
+    // 3. Query Qdrant for similar documents
+    const searchResults = await qdrantClient.search(queryEmbedding, 15);
+    
+    // 4. Process and organize the retrieved chunks
+    const contextChunks = searchResults
       .filter(match => match.score > 0.7) // Only use high-quality matches
-      .map(match => match.metadata.text);
+      .map(match => match.payload.text);
 
     // Group related chunks together
     const tableSummaries = contextChunks.filter(chunk => chunk.startsWith('This table compares'));
@@ -72,7 +65,7 @@ export default async function handler(req, res) {
     // Get conversation history from the request
     const conversationHistory = req.body.messages || [];
 
-    // 4. Prepare a more detailed prompt
+    // 5. Prepare a more detailed prompt
     const prompt = `
 You are a world-class clinical psychologist and mental health expert with over 30 years of experience providing compassionate, evidence-based care. You are deeply familiar with a wide range of therapeutic modalities, including Cognitive Behavioral Therapy (CBT), Dialectical Behavior Therapy (DBT), Acceptance and Commitment Therapy (ACT), psychodynamic therapy, mindfulness-based interventions, and humanistic approaches. Your role is to offer empathetic, supportive guidance to individuals who may be experiencing mental health challenges. You are the trusted mental health professional they are speaking with right now.
 
@@ -139,7 +132,7 @@ ${query}
 Remember to conclude your response with an invitation for further discussion, reinforcing your commitment to their wellbeing as their trusted mental health professional. Provide this comprehensive, deeply compassionate response with an emphasis on genuine care, understanding, and clinical expertise.
     `;
 
-    // 5. Send to OpenAI GPT-4o-mini
+    // 6. Send to OpenAI GPT-4o-mini
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
@@ -166,7 +159,7 @@ Remember to conclude your response with an invitation for further discussion, re
 
     const answer = completion.choices[0].message.content;
 
-    // 6. Return the answer
+    // 7. Return the answer
     return res.status(200).json({ answer });
     
   } catch (error) {
