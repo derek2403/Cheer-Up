@@ -570,7 +570,7 @@ export default function RoomScene() {
           scene.updateMatrixWorld(true)
         }}
       >
-          <PerspectiveCamera makeDefault position={[8, 5, 8]} fov={75} />
+          <PerspectiveCamera makeDefault position={[3.24, 0.69, 0.66]} fov={75} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[3, 3, 3]} intensity={1} />
           <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
@@ -706,7 +706,7 @@ export default function RoomScene() {
           screenSpacePanning={true}      // Enable screen space panning
           panSpeed={1.5}                 // Adjust pan speed
           target0={[0, 0, 0]}           // Initial target position
-          position0={[8, 5, 8]}         // Initial camera position
+          position0={[5, 3, 5]}         // Initial camera position
           enableDamping={true}          // Smooth camera movement
           dampingFactor={0.05}          // Adjust damping strength
           />
