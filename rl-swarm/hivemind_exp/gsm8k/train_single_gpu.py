@@ -140,13 +140,18 @@ def main():
     # Add command-line argument for continuous conversation mode
     parser = argparse.ArgumentParser(description="Run the training loop")
     parser.add_argument("--continuous", action="store_true", help="Use continuous conversation mode")
+    parser.add_argument("--use_chat_json", type=str, default="False", help="Read questions from chat.json instead of user input")
     args, unknown = parser.parse_known_args()
     
-    # Use continuous conversation mode if requested
-    data_getter = get_user_input_with_continuous_conversation if args.continuous else get_user_input_with_supervisor_simulation
-    
-    if args.continuous:
+    # Determine which data getter function to use
+    if args.use_chat_json.lower() == "true":
+        print("Reading questions from chat.json file")
+        data_getter = get_user_input_samples
+    elif args.continuous:
         print("Using continuous conversation mode with feedback from previous sessions")
+        data_getter = get_user_input_with_continuous_conversation 
+    else:
+        data_getter = get_user_input_with_supervisor_simulation
     
     # Initialize the TRL parser
     trl_parser = TrlParser((ModelConfig, GRPOArguments, TestnetGRPOArguments, GRPOConfig))
