@@ -8,6 +8,8 @@ import { useRouter } from 'next/router'
 import Cloud from '../components/cloud'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import Header from '../components/Header'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 // Character component with animations and movement
 function Character({ floorMesh, onMoveComplete }) {
@@ -519,12 +521,59 @@ export default function RoomScene() {
   const groupRef = useRef()
   const [moveCallback, setMoveCallback] = useState(null)
   
+  // Wallet and mood tracking state
+  const [walletConnected, setWalletConnected] = useState(false)
+  const [showMoodTracker, setShowMoodTracker] = useState(false)
+  const [hasSelectedMoodToday, setHasSelectedMoodToday] = useState(false)
+  
   // Evaluate and Improve state
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const modalRef = useRef(null);
+  
+  // Check if user has already selected mood today
+  useEffect(() => {
+    const checkMoodHistory = async () => {
+      try {
+        const response = await fetch('/api/check-mood-today');
+        const data = await response.json();
+        
+        if (data.hasSelectedToday) {
+          setHasSelectedMoodToday(true);
+        }
+      } catch (error) {
+        console.error('Error checking mood history:', error);
+      }
+    };
+    
+    checkMoodHistory();
+  }, []);
+  
+  // Simulate wallet connection (replace with actual wallet connection logic)
+  useEffect(() => {
+    // For demo purposes, we'll simulate wallet connection after 2 seconds
+    const timer = setTimeout(() => {
+      setWalletConnected(true);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Show mood tracker when wallet is connected but only if user hasn't selected mood today
+  useEffect(() => {
+    if (walletConnected && !hasSelectedMoodToday) {
+      setShowMoodTracker(true);
+    }
+  }, [walletConnected, hasSelectedMoodToday]);
+  
+  // Handler for when mood is saved
+  const handleMoodSave = (mood) => {
+    setHasSelectedMoodToday(true);
+    setShowMoodTracker(false);
+    console.log('User mood saved:', mood);
+  };
   
   // Handle character movement events
   useEffect(() => {
@@ -643,6 +692,54 @@ export default function RoomScene() {
           <p>Floor Detected: {floorMesh ? 'Yes' : 'No'}</p>
           <p>Press 'D' to toggle debug view</p>
           <p>Middle mouse or right-click to move character</p>
+        </div>
+      )}
+      
+      {/* Mood Tracker Modal */}
+      {showMoodTracker && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="relative z-10 bg-white rounded-xl p-8 max-w-md w-full shadow-2xl">
+            <h2 className="text-2xl font-semibold mb-6 text-center">Welcome! How are you feeling today?</h2>
+            
+            <div className="grid grid-cols-5 gap-4 mb-8">
+              {[
+                { value: 1, label: '😞', description: 'Very Bad' },
+                { value: 2, label: '😕', description: 'Bad' },
+                { value: 3, label: '😐', description: 'Neutral' },
+                { value: 4, label: '🙂', description: 'Good' },
+                { value: 5, label: '😄', description: 'Very Good' }
+              ].map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/save-mood', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                          mood: mood.value,
+                          date: new Date().toISOString().split('T')[0]
+                        })
+                      });
+                      
+                      if (response.ok) {
+                        handleMoodSave(mood);
+                      } else {
+                        console.error('Failed to save mood');
+                      }
+                    } catch (error) {
+                      console.error('Error saving mood:', error);
+                    }
+                  }}
+                  className="flex flex-col items-center p-4 rounded-lg transition-all hover:bg-gray-100"
+                >
+                  <span className="text-4xl mb-2">{mood.label}</span>
+                  <span className="text-sm text-gray-600">{mood.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
       
