@@ -105,12 +105,12 @@ export const ConnectWallet = () => {
       setLabel(`Logout ${signedAccountId}`);
     } else {
       setAction(() => signIn);
-      setLabel('Login');
+      setLabel('Connect Wallet');
     }
   }, [signedAccountId]);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+    <div>
       <div className="flex justify-between items-center space-x-8">
         {/* Subscription status */}
         {isLoggedIn && isSubscribed && (
@@ -135,7 +135,7 @@ export const ConnectWallet = () => {
         {/* For non-subscribed users, show a subscribe button */}
         {isLoggedIn && !isSubscribed && (
           <button 
-            onClick={() => setShowSubscriptionPopup(true)}
+            onClick={() => setShowSubscriptionPopup(true)}//sub button coloru
             className="text-sm px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors mr-4"
           >
             Subscribe
@@ -145,7 +145,7 @@ export const ConnectWallet = () => {
         {/* If not logged in, show empty div for spacing */}
         {!isLoggedIn && <div></div>}
         
-        <button 
+        <button //
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded transition-colors ml-auto"
           onClick={action}
         >
