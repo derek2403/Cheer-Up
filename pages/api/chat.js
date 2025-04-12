@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     
     const queryResult = await index.query({
       vector: queryEmbedding,
-      topK: 10, // Increased from 5 to 10 for better context
+      topK: 15, // 10 to 15 for better context
       includeMetadata: true
     });
 
