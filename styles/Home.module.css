@@ -1,15 +1,13 @@
 .container {
   min-height: 100vh;
-  padding: 0 0.5rem;
+  padding: 0 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
 }
 
 .main {
-  min-height: 100vh;
   padding: 2rem 0;
   flex: 1;
   display: flex;
@@ -17,6 +15,8 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .title {
