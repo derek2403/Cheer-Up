@@ -386,6 +386,18 @@ def print_training_summary(node: HivemindNode):
     if not all([(0, 0) in node.round_cache, (0, 1) in node.round_cache, (0, 2) in node.round_cache]):
         return
     
+    # Get path to supervisor_content.txt file for direct writing
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(os.path.dirname(current_dir))
+    file_path = os.path.join(root_dir, "supervisor_content.txt")
+    
+    # Begin writing summary
+    with open(file_path, "a") as f:
+        f.write("\n\n" + "=" * 80 + "\n")
+        f.write("FINAL SUMMARY OF ALL STAGES\n")
+        f.write("=" * 80 + "\n")
+    
     print("\n\n" + "=" * 80)
     print("FINAL SUMMARY OF ALL STAGES")
     print("=" * 80)
@@ -449,24 +461,57 @@ def print_training_summary(node: HivemindNode):
         stage_num = stage_data["stage"]
         outputs = stage_data["outputs"]
         
+        # Write to file
+        with open(file_path, "a") as f:
+            f.write(f"\n\n{'*' * 30} STAGE {stage_num} OUTPUT {'*' * 30}\n\n")
+        
+        # Also print to console
         print(f"\n\n{'*' * 30} STAGE {stage_num} OUTPUT {'*' * 30}\n")
         
         # Stage 0: Initial Question and Response
         if stage_num == 0 and "question" in outputs:
-            print(f"CLIENT QUESTION:\n{outputs.get('question', 'N/A')}\n")
+            question_text = outputs.get('question', 'N/A')
+            print(f"CLIENT QUESTION:\n{question_text}\n")
+            
+            # Write to file
+            with open(file_path, "a") as f:
+                f.write(f"CLIENT QUESTION:\n{question_text}\n\n")
+            
             if "responses" in outputs and outputs["responses"]:
-                print(f"THERAPIST RESPONSE:\n{outputs['responses'][0]}\n")
+                response_text = outputs['responses'][0]
+                print(f"THERAPIST RESPONSE:\n{response_text}\n")
+                
+                # Write to file
+                with open(file_path, "a") as f:
+                    f.write(f"THERAPIST RESPONSE:\n{response_text}\n\n")
         
         # Stage 1: Comparing Therapeutic Responses
         elif stage_num == 1:
             if "responses" in outputs and outputs["responses"]:
-                print(f"SUPERVISOR EVALUATION:\n{outputs['responses'][0]}\n")
+                supervisor_text = outputs['responses'][0]
+                print(f"SUPERVISOR EVALUATION:\n{supervisor_text}\n")
+                
+                # Write to file
+                with open(file_path, "a") as f:
+                    f.write(f"SUPERVISOR EVALUATION:\n{supervisor_text}\n\n")
         
         # Stage 2: Final Integration
         elif stage_num == 2:
             if "responses" in outputs and outputs["responses"]:
-                print(f"CLINICAL DIRECTOR SYNTHESIS:\n{outputs['responses'][0]}\n")
+                synthesis_text = outputs['responses'][0]
+                print(f"CLINICAL DIRECTOR SYNTHESIS:\n{synthesis_text}\n")
+                
+                # Write to file
+                with open(file_path, "a") as f:
+                    f.write(f"CLINICAL DIRECTOR SYNTHESIS:\n{synthesis_text}\n\n")
     
+    # End of summary
     print("=" * 80)
     print("END OF TRAINING SUMMARY")
     print("=" * 80)
+    
+    # Write end of summary to file
+    with open(file_path, "a") as f:
+        f.write("=" * 80 + "\n")
+        f.write("END OF TRAINING SUMMARY\n")
+        f.write("=" * 80 + "\n")

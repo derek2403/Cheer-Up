@@ -263,6 +263,22 @@ def generate_stage3_user_prompt(datum, cols):
     # Create the log file path 
     log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
     
+    # Record all therapist responses if not already recorded
+    with open(log_file_path, "a") as f:
+        f.write("# All Therapist Responses from Full Stage\n\n")
+    
+    # Record the therapist answers from the stage2_prompt
+    if 'stage2_prompt' in datum:
+        # Extract therapist answers from the stage2_prompt
+        therapist_pattern = r'<therapist>Therapist #(\d+)</therapist> said\n([\s\S]*?)(?=\n\n\n|\Z)'
+        matches = re.finditer(therapist_pattern, datum['stage2_prompt'])
+        
+        for match in matches:
+            therapist_id = match.group(1)
+            therapist_text = match.group(2).strip()
+            # Record each therapist answer
+            record_therapist_answer(therapist_id, therapist_text)
+    
     # Record all supervisor feedback with their IDs
     with open(log_file_path, "a") as f:
         f.write("# All Supervisor Feedback\n\n")
@@ -506,9 +522,19 @@ def get_user_input_with_supervisor_simulation():
         prompt = f"The client concern we received is: {x['question']}\n\n"
         prompt += "The following therapeutic responses were provided:\n"
         
+        # Create the log file path
+        log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+        
+        # Add a header for therapist answers
+        with open(log_file_path, "a") as f:
+            f.write("# All Therapist Responses\n\n")
+        
         for i, agent_id in enumerate(agent_ids):
             col = f"agent_answers_{agent_id}"
             if col in x:
+                # Record the therapist answer
+                record_therapist_answer(i, x[col])
+                
                 prompt += f"<therapist>Therapist #{i}</therapist> said\n"
                 prompt += x[col]
                 prompt += "\n\n\n"
@@ -595,3 +621,280 @@ This approach aligns with best practices in therapeutic intervention for this ty
     
     # Return the same dataset for both train and test
     return dataset, dataset
+
+
+def extract_valuable_supervisor_feedback():
+    """
+    Extract supervisor feedback from entries numbered as multiples of 3
+    to use for improving model responses.
+    """
+    log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+    
+    try:
+        with open(log_file_path, "r") as f:
+            content = f.read()
+        
+        # Extract supervisor feedback from entries that are multiples of 3
+        valuable_feedback = []
+        
+        # Look for patterns like <supervisor id="X" entry="3"> or <supervisor_feedback #3>
+        id_pattern = r'<supervisor id="[^"]*" entry="(\d+)">\n([\s\S]*?)\n</supervisor>'
+        feedback_pattern = r'<supervisor_feedback #(\d+)>\n([\s\S]*?)\n</supervisor_feedback>'
+        
+        # Extract feedback with ID entries
+        id_matches = re.finditer(id_pattern, content)
+        for match in id_matches:
+            entry_num = int(match.group(1))
+            if entry_num % 3 == 0:  # Only take entries that are multiples of 3
+                feedback_text = match.group(2).strip()
+                valuable_feedback.append({
+                    "entry": entry_num,
+                    "text": feedback_text
+                })
+        
+        # Extract feedback with numbered entries
+        feedback_matches = re.finditer(feedback_pattern, content)
+        for match in feedback_matches:
+            entry_num = int(match.group(1))
+            if entry_num % 3 == 0:  # Only take entries that are multiples of 3
+                feedback_text = match.group(2).strip()
+                valuable_feedback.append({
+                    "entry": entry_num,
+                    "text": feedback_text
+                })
+        
+        return valuable_feedback
+    except Exception as e:
+        print(f"Error extracting supervisor feedback: {e}")
+        return []
+
+
+def get_user_input_with_continuous_conversation():
+    """
+    Creates a dataset with a single sample based on user input with 
+    continuous conversation using valuable supervisor feedback.
+    """
+    from datasets import Dataset
+    
+    # First, extract valuable supervisor feedback from previous sessions
+    valuable_feedback = extract_valuable_supervisor_feedback()
+    
+    # Get user input
+    print("\n--- Chatbot with Improved Responses based on Supervisor Feedback ---")
+    if valuable_feedback:
+        print(f"Using {len(valuable_feedback)} pieces of valuable feedback from past sessions")
+    
+    user_question = input("\nPlease enter your mental health question: ")
+    
+    # Create a dataset with just this question
+    data = {
+        "question": [user_question],
+        "answer": ["#### This is a mental health question"]
+    }
+    
+    # Create the datasets directly
+    dataset = Dataset.from_dict(data)
+    
+    # Convert dataset to the expected format for stage 1
+    dataset = get_gsm8k_questions(dataset)
+    
+    # Create improved system prompt using valuable feedback
+    enhanced_system_prompt = STAGE1_SYSTEM_PROMPT
+    
+    if valuable_feedback:
+        # Add the valuable feedback to the system prompt
+        enhanced_system_prompt += "\n\n### Learning from Supervisor Feedback:\n"
+        enhanced_system_prompt += "Below are valuable pieces of therapeutic advice from expert supervisors that you should incorporate into your approach:\n\n"
+        
+        for i, feedback in enumerate(valuable_feedback):
+            # Extract the most useful parts of the feedback
+            # Look for sections that provide actionable advice
+            clean_feedback = feedback["text"]
+            
+            # If there's a ** heading, try to extract the most relevant parts
+            if "**" in clean_feedback:
+                sections = re.split(r'\*\*(.*?)\*\*', clean_feedback)
+                for j in range(1, len(sections), 2):
+                    if j+1 < len(sections) and len(sections[j+1].strip()) > 50:
+                        enhanced_system_prompt += f"- **{sections[j].strip()}**: {sections[j+1].strip()[:200]}...\n\n"
+            else:
+                # Just take the first part of the feedback if it's long
+                enhanced_system_prompt += f"- Advice #{i+1}: {clean_feedback[:200]}...\n\n"
+    
+    # Update the dataset with the enhanced system prompt
+    dataset = dataset.map(lambda x: {
+        "prompt": [
+            {"role": "system", "content": enhanced_system_prompt},
+            {"role": "user", "content": x["question"]},
+        ]
+    })
+    
+    # Create a more interactive simulation with therapist responses that 
+    # incorporate feedback from supervisors
+    agent_answers = {}
+    agent_ids = ["agent1", "agent2"]
+    
+    # Add the agent answers with proper column naming but now incorporating feedback
+    for agent_id in agent_ids:
+        column_name = f"agent_answers_{agent_id}"
+        agent_answers[column_name] = f"I understand you're sharing about {user_question[:30]}... Let me help you with this situation."
+    
+    # Add each agent answer as a separate column
+    for col, value in agent_answers.items():
+        dataset = dataset.map(lambda x: {col: value})
+    
+    # Use the standard simulation steps but with the enhanced content
+    def simple_stage2_prompt(x):
+        prompt = f"The client concern we received is: {x['question']}\n\n"
+        prompt += "The following therapeutic responses were provided:\n"
+        
+        # Create the log file path
+        log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+        
+        # Add a header for therapist answers
+        with open(log_file_path, "a") as f:
+            f.write("# All Therapist Responses (Continuous Mode)\n\n")
+        
+        for i, agent_id in enumerate(agent_ids):
+            col = f"agent_answers_{agent_id}"
+            if col in x:
+                # Record the therapist answer
+                record_therapist_answer(i, x[col])
+                
+                prompt += f"<therapist>Therapist #{i}</therapist> said\n"
+                prompt += x[col]
+                prompt += "\n\n\n"
+                
+        # Add context from valuable feedback if available
+        if valuable_feedback:
+            prompt += "\n### Context from Previous Similar Cases:\n"
+            for feedback in valuable_feedback:
+                if len(feedback["text"]) > 300:
+                    prompt += f"Previous expert advice: {feedback['text'][:300]}...\n\n"
+                else:
+                    prompt += f"Previous expert advice: {feedback['text']}\n\n"
+                
+        return prompt
+    
+    # Generate stage2 prompt
+    dataset = dataset.map(lambda x: {"stage2_prompt": simple_stage2_prompt(x)})
+    
+    # Create a modified simulation of supervisor feedback that incorporates previous valuable feedback
+    supervisor_feedback = {}
+    supervisor_ids = ["supervisor1", "supervisor2"]
+    
+    for supervisor_id in supervisor_ids:
+        column_name = f"agent_opinion_{supervisor_id}"
+        feedback_text = f"""After reviewing the therapeutic responses for "{user_question[:30]}...":
+**Clinical Evaluation**
+"""
+        # Incorporate valuable feedback if available
+        if valuable_feedback:
+            feedback_text += "Based on previous successful interventions and incorporating expert advice:\n\n"
+            for feedback in valuable_feedback:
+                if "Clinical Evaluation" in feedback["text"]:
+                    # Try to extract clinical insights
+                    clinical_part = feedback["text"].split("Clinical Evaluation")[1].split("\n\n")[0]
+                    feedback_text += clinical_part + "\n"
+        else:
+            feedback_text += "The therapist establishes good rapport and uses evidence-based techniques appropriate for this situation.\n"
+            
+        supervisor_feedback[column_name] = feedback_text
+    
+    # Add each supervisor opinion as a separate column
+    for col, value in supervisor_feedback.items():
+        dataset = dataset.map(lambda x: {col: value})
+    
+    # Generate stage3 prompt including previous feedback
+    def enhanced_stage3_prompt(x):
+        prompt = f"{x['stage2_prompt']}\n"
+        prompt += "After comparing these therapeutic responses, the following supervision feedback was provided:\n"
+        
+        # Store extracted contents
+        supervisor_contents = []
+        
+        # Create the log file path
+        log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+        
+        # Record all supervisor feedback with their IDs
+        with open(log_file_path, "a") as f:
+            f.write("# All Supervisor Feedback from Enhanced Conversation\n\n")
+        
+        # Get the current supervisor entry number
+        supervisor_entry_num = 1
+        try:
+            with open(log_file_path, "r") as f:
+                content = f.read()
+                supervisor_entry_num = content.count("<supervisor id=") + 1
+        except:
+            pass
+        
+        for i, supervisor_id in enumerate(supervisor_ids):
+            col = f"agent_opinion_{supervisor_id}"
+            if col in x:
+                feedback_text = x[col]
+                
+                # Record the supervisor feedback with ID and entry number
+                with open(log_file_path, "a") as f:
+                    f.write(f"<supervisor id=\"{i}\" entry=\"{supervisor_entry_num}\">\n{feedback_text}\n</supervisor>\n\n")
+                    supervisor_entry_num += 1
+                
+                # Extract content after ** marker
+                extracted_content = extract_supervisor_content(feedback_text, record_raw_response=False)
+                if extracted_content:
+                    supervisor_contents.append(extracted_content)
+                
+                prompt += f"<supervisor>Supervisor #{i}</supervisor> provided\n"
+                prompt += feedback_text
+                prompt += "\n\n\n"
+        
+        # Add all extracted contents at the very end
+        if supervisor_contents:
+            prompt += "\n\n\n\n\n"
+            for content in supervisor_contents:
+                prompt += content
+                prompt += "\n"
+                
+        # Add a section about continuing the conversation with improved responses
+        prompt += "\n\n### Note for Model: Continue the conversation with the client incorporating this feedback."
+        prompt += " Don't stop the dialog flow, but rather use the feedback to provide an improved response.\n"
+        
+        return prompt
+    
+    # Generate final prompt with all the enhancements
+    dataset = dataset.map(lambda x: {"stage3_prompt": enhanced_stage3_prompt(x)})
+    
+    print("Enhanced conversation system is ready. Model will incorporate valuable feedback from entries 3, 6, 9, etc.")
+    
+    # Return the enhanced dataset
+    return dataset, dataset
+
+
+def record_therapist_answer(therapist_id, therapist_text):
+    """
+    Record a therapist's answer to the supervisor_content.txt file.
+    
+    Parameters:
+    - therapist_id: The ID of the therapist
+    - therapist_text: The text of the therapist's answer
+    """
+    # Create the log file path
+    log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+    
+    # Get the current therapist entry number
+    therapist_entry_num = 1
+    try:
+        with open(log_file_path, "r") as f:
+            content = f.read()
+            therapist_entry_num = content.count("<therapist_answer") + 1
+    except:
+        # If file doesn't exist or can't be read, start with entry 1
+        pass
+        
+    # Record the therapist answer with ID and entry number
+    with open(log_file_path, "a") as f:
+        f.write(f"<therapist_answer id=\"{therapist_id}\" entry=\"{therapist_entry_num}\">\n{therapist_text}\n</therapist_answer>\n\n")
+        # Add a separator line for readability
+        f.write("-" * 80 + "\n\n")
+        
+    print(f"Therapist answer (ID: {therapist_id}, Entry: {therapist_entry_num}) recorded to {log_file_path}")
