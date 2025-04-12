@@ -7,7 +7,7 @@ export default function RoomScene() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas>
-        <PerspectiveCamera makeDefault position={[15, 15, 15]} fov={50} far={1000} />
+        <PerspectiveCamera makeDefault position={[0, 2, 5]} fov={60} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 3, 3]} intensity={1} />
         <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
@@ -96,11 +96,7 @@ export default function RoomScene() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={10}
-          maxDistance={100}
-          target={[0, 10, 0]}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2}
+          minDistance={2}
         />
       </Canvas>
     </div>
