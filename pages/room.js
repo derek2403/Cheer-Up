@@ -177,24 +177,43 @@ function Character({ floorMesh, onMoveComplete }) {
       )
       
       if (direction.length() < 0.1) {
-        isMovingRef.current = false
-        
+        isMovingRef.current = false // Stop movement calculation immediately
+
         if (actionsRef.current.idle && actionsRef.current.walk) {
+          // Start fading out walk animation
           actionsRef.current.walk.fadeOut(0.2)
+          // Reset and fade in idle animation
           actionsRef.current.idle.reset().fadeIn(0.2).play()
         }
-        
-        // Call onMoveComplete when movement is done
+
+        // Call onMoveComplete after the desired delay (800ms)
+        // The animation fade (200ms) happens concurrently
         if (onMoveComplete) {
-          onMoveComplete()
+          // Clear any existing timeout to prevent multiple triggers
+          if (window.moveCompleteTimeout) {
+            clearTimeout(window.moveCompleteTimeout)
+          }
+          // Set a new timeout
+          window.moveCompleteTimeout = setTimeout(() => {
+            // Ensure walk is fully stopped before transition, in case fadeOut is interrupted
+            if (actionsRef.current.walk?.isRunning()) {
+              actionsRef.current.walk.stop();
+            }
+            onMoveComplete() // Execute the original callback
+            window.moveCompleteTimeout = null // Clear the timeout reference
+          }, 500) // 0.5s delay (starts when fade starts)
         }
       } else {
-        direction.normalize()
+        // Calculate movement direction (normalized)
+        // Clone direction before normalizing so original can be used for rotation
+        const moveDirection = direction.clone().normalize()
         const moveSpeed = 2.0 * delta
-        currentPosition.x += direction.x * moveSpeed
-        currentPosition.z += direction.z * moveSpeed
-        
+        const moveStep = moveDirection.multiplyScalar(moveSpeed)
+
+        // Update rotation first based on original (non-normalized) direction
         modelRef.current.rotation.y = Math.atan2(direction.x, direction.z)
+        // Move character towards target
+        currentPosition.add(moveStep)
       }
     }
   })

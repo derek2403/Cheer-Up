@@ -228,7 +228,8 @@ export default function FifthRowBall() {
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 cursor: ball.clickable ? 'pointer' : 'default',
                 zIndex: 20,
-                WebkitTapHighlightColor: 'transparent'
+                WebkitTapHighlightColor: 'transparent',
+                opacity: (ball.name === 'red' || ball.name === 'green') ? 0 : 1
               }}
               onClick={() => {
                 if (ball.clickable) {
