@@ -4,7 +4,7 @@ import Image from 'next/image';
 import styles from '../styles/Header.module.css';
 import { ConnectWallet } from './ConnectWallet';
 
-export default function Header() {
+export default function header() {
   return (
     <header className={styles.header}>
       <div className={styles.headerContainer}>
