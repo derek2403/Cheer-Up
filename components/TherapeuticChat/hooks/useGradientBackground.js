@@ -2,28 +2,28 @@ import { useState, useEffect } from 'react';
 
 const useGradientBackground = () => {
   const [gradientAngle, setGradientAngle] = useState(45);
-  const [gradientColors, setGradientColors] = useState({
-    color1: 'rgba(255, 255, 255, 0.8)',
-    color2: 'rgba(173, 216, 230, 0.9)'
-  });
+  const [hue1, setHue1] = useState(0); // First color hue
+  const [hue2, setHue2] = useState(60); // Second color hue, offset by 60 degrees
 
   // Animate gradient background
   useEffect(() => {
     const interval = setInterval(() => {
-      // Change gradient angle
-      setGradientAngle(prev => (prev + 1) % 360);
+      // Change gradient angle slowly
+      setGradientAngle(prev => (prev + 0.5) % 360);
       
-      // Occasionally change gradient colors slightly
-      if (Math.random() > 0.95) {
-        setGradientColors({
-          color1: `rgba(255, 255, 255, ${0.7 + Math.random() * 0.3})`,
-          color2: `rgba(${173 + Math.floor(Math.random() * 30)}, ${216 + Math.floor(Math.random() * 30)}, ${230 + Math.floor(Math.random() * 25)}, 0.9)`
-        });
-      }
-    }, 100);
+      // Cycle through all hues (0-360) much faster
+      setHue1(prev => (prev + 10) % 360);
+      setHue2(prev => (prev + 10) % 360);
+    }, 1); // Keep the fastest possible interval
     
     return () => clearInterval(interval);
   }, []);
+
+  // Convert hue to HSLA colors with good saturation and lightness for visibility
+  const gradientColors = {
+    color1: `hsla(${hue1}, 70%, 85%, 0.8)`,
+    color2: `hsla(${hue2}, 70%, 85%, 0.9)`
+  };
 
   return { gradientAngle, gradientColors };
 };
