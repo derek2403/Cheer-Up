@@ -590,9 +590,10 @@ export default function RoomScene() {
         }}
       >
           <PerspectiveCamera makeDefault position={[3.24, 0.69, 0.66]} fov={75} />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[3, 3, 3]} intensity={1} />
-          <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
+          <ambientLight intensity={1.2} color="#ffffff" />
+          <directionalLight position={[3, 5, 3]} intensity={0.8} color="#f5f5dc" castShadow />
+          <spotLight position={[0, 5, 0]} angle={0.6} penumbra={0.8} intensity={0.7} distance={15} castShadow />
+          <hemisphereLight args={["#b1e1ff", "#ffeeb1", 0.6]} /> 
 
         <Suspense fallback={null}>
           {/* Floor detector component to find the floor mesh */}
@@ -615,13 +616,13 @@ export default function RoomScene() {
             {/* Back wall */}
             <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
               <boxGeometry args={[10, 4, 0.2]} />
-              <meshStandardMaterial color="#ADD8E6" />
+              <meshStandardMaterial color="#ADD8E6" roughness={0.4} metalness={0.1} />
             </mesh>
             
             {/* Right wall */}
             <mesh position={[5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
               <boxGeometry args={[10, 4, 0.2]} />
-              <meshStandardMaterial color="#ADD8E6" />
+              <meshStandardMaterial color="#ADD8E6" roughness={0.4} metalness={0.1} />
             </mesh>
             
             {/* Floor - IMPORTANT: This must be present for character movement */}
