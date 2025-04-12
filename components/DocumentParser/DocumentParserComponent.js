@@ -66,22 +66,20 @@ export const DocumentParserComponent = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#fff' }}>
-      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}>
-        <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Document Parser Demo</h1>
-        
-        <FileUpload
-          file={file}
-          fileError={fileError}
-          isLoading={isLoading}
-          onFileChange={handleFileChange}
-          onSubmit={handleSubmit}
-        />
+    <div>
+      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Document Parser Demo</h1>
+      
+      <FileUpload
+        file={file}
+        fileError={fileError}
+        isLoading={isLoading}
+        onFileChange={handleFileChange}
+        onSubmit={handleSubmit}
+      />
 
-        {isLoading && <LoadingIndicator />}
-        
-        <OutputSection parsedData={parsedData} />
-      </main>
+      {isLoading && <LoadingIndicator />}
+      
+      <OutputSection parsedData={parsedData} />
     </div>
   );
 }; 
