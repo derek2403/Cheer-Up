@@ -158,9 +158,9 @@ export const ConnectWallet = () => {
     
     if (signedAccountId) {
       setAction(() => signOut);
-      // Truncate long account names for better display
-      const displayName = signedAccountId.length > 16 
-        ? `${signedAccountId.slice(0, 10)}...${signedAccountId.slice(-6)}`
+      // Truncate long wallet addresses to prevent overflow
+      const displayName = signedAccountId.length > 15 
+        ? `${signedAccountId.slice(0, 7)}...${signedAccountId.slice(-5)}`
         : signedAccountId;
       setLabel(`Logout ${displayName}`);
       
@@ -179,69 +179,53 @@ export const ConnectWallet = () => {
   // Simple static render for SSR
   if (!isMounted) {
     return (
-      <div>
-        <div className="flex justify-between items-center space-x-4">
-          <div></div>
-          <button
-            className="text-white font-medium py-1.5 px-4 rounded-full transition-all duration-300 flex items-center gap-1 text-sm"
-          >
-            Connect Wallet
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 8V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H12C12.5304 20 13.0391 19.7893 13.4142 19.4142C13.7893 19.0391 14 18.5304 14 18V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M9 12H21M21 12L18 9M21 12L18 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+      <button className="flex items-center justify-center gap-2 text-base font-semibold px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
+        <span>Connect Wallet</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 8V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H12C12.5304 20 13.0391 19.7893 13.4142 19.4142C13.7893 19.0391 14 18.5304 14 18V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M9 12H21M21 12L18 9M21 12L18 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
     );
   }
 
   // Client-side render
   return (
-    <div>
-      <div className="flex justify-between items-center space-x-4">
-        {/* Subscription status */}
-        {isLoggedIn && isSubscribed && (
-          <div 
-            className="text-xs mr-3 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setShowSubscriptionPopup(true)}
-          >
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              <svg className="-ml-0.5 mr-1 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
-                <circle cx="4" cy="4" r="3" />
-              </svg>
-              Subscribed
-            </span>
-          </div>
-        )}
-        
-        {/* For non-subscribed users, show a subscribe button */}
-        {isLoggedIn && !isSubscribed && (
-          <button 
-            onClick={() => setShowSubscriptionPopup(true)}
-            className="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors mr-3"
-          >
-            Subscribe
-          </button>
-        )}
-        
-        {/* If not logged in, show empty div for spacing */}
-        {!isLoggedIn && <div></div>}
-        
-        <button
-          className="text-white font-medium py-1.5 px-4 rounded-full transition-all duration-300 flex items-center gap-1 text-sm"
-          onClick={action}
-        >
-          {label}
-          {!isLoggedIn && (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div className="flex items-center gap-2">
+      <button
+        onClick={action}
+        className="flex items-center justify-center gap-3 py-2 px-5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300 text-base font-semibold text-white border border-blue-400 hover:border-blue-500 transform hover:-translate-y-0.5"
+      >
+        {!isLoggedIn ? (
+          <>
+            {label}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
               <path d="M14 8V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H12C12.5304 20 13.0391 19.7893 13.4142 19.4142C13.7893 19.0391 14 18.5304 14 18V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9 12H21M21 12L18 9M21 12L18 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-          )}
+          </>
+        ) : (
+          <>
+            {label}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+              <path d="M17 16L21 12L17 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </>
+        )}
+      </button>
+
+      {/* For non-subscribed users, show a subscribe button after login */}
+      {isLoggedIn && !isSubscribed && (
+        <button 
+          onClick={() => setShowSubscriptionPopup(true)}
+          className="ml-2 text-sm px-4 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition-colors font-medium hover:shadow-sm border border-blue-200 transform hover:-translate-y-0.5 hover:border-blue-300"
+        >
+          Subscribe
         </button>
-      </div>
-      
+      )}
+
       {/* Subscription popup - use Portal component to ensure proper positioning */}
       {showSubscriptionPopup && (
         <Portal>
@@ -257,10 +241,8 @@ export const ConnectWallet = () => {
       )}
       
       {isLoggedIn && isMetaMaskConnected && (
-        <div className="mt-2 bg-yellow-50 border-l-4 border-yellow-500 p-2 text-xs">
-          <p className="text-yellow-700">
-            ⚠️ Using MetaMask. For best results, we recommend a NEAR native wallet.
-          </p>
+        <div className="mt-1 text-xs text-yellow-700">
+          ⚠️ Using MetaMask
         </div>
       )}
     </div>

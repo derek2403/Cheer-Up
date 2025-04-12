@@ -21,11 +21,9 @@ const Logo = () => (
   </div>
 );
 
-// Wallet button component on the right
+// Wallet button component on the right - removing the wrapper div
 const ConnectWalletButton = () => (
-  <div className={styles.contactButton}>
-    <ConnectWallet />
-  </div>
+  <ConnectWallet />
 );
 
 const Header = () => {
@@ -41,7 +39,7 @@ const Header = () => {
     return (
       <header className={styles.header}>
         <div className={styles.logoContainer}></div>
-        <div className={styles.walletContainer}></div>
+        <div className={styles.walletButtonContainer}></div>
       </header>
     );
   }
@@ -53,7 +51,7 @@ const Header = () => {
         <Logo />
       </Link>
       
-      <div className={styles.walletContainer}>
+      <div className={styles.walletButtonContainer}>
         <ConnectWalletButton />
       </div>
     </header>
