@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Header from '../components/header';
-import Chatbot from '../components/chatbot';
+import TherapeuticChat from '../components/TherapeuticChat';
 import styles from '../styles/Home.module.css';
 import { useState, useEffect } from 'react';
 
@@ -96,7 +96,7 @@ export default function ChatbotPage() {
           </button>
         </div>
         
-        <Chatbot />
+        <TherapeuticChat />
       </main>
 
       <style jsx global>{`
