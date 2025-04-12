@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import Header from '../components/Header';
+import Header from '../components/header';
 import Chatbot from '../components/chatbot';
 import styles from '../styles/Home.module.css';
 import { useState, useEffect } from 'react';
