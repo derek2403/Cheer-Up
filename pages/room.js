@@ -6,12 +6,8 @@ import * as THREE from 'three'
 import { MOUSE } from 'three'
 import { useRouter } from 'next/router'
 import Cloud from '../components/cloud'
-import Header from '../components/Header'
-// import GalaxyBackground from '../components/GalaxyBackground'
-
-// Either import your CSS module
-// import styles from '../styles/Room.module.css'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import Header from '../components/Header'
 // import GalaxyBackground from '../components/GalaxyBackground'
 
 // Character component with animations and movement
@@ -246,6 +242,9 @@ function DebugHelper({ floorMesh }) {
   )
 }
 
+// Either import your CSS module
+// import styles from '../styles/Room.module.css'
+
 function GLBModel({ url, position, rotation, scale, materialColor }) {
   const { scene } = useGLTF(url)
   const router = useRouter()
@@ -440,50 +439,83 @@ export default function RoomScene() {
       <Header />
       
       <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-        {/* Add the Cloud component as background */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
           <Cloud />
         </div>
         
-        <Canvas>
+        {debugMode && (
+        <div style={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: 10,
+          borderRadius: 5,
+          fontFamily: 'monospace',
+          zIndex: 1000
+        }}>
+          <p>Floor Detected: {floorMesh ? 'Yes' : 'No'}</p>
+          <p>Press 'D' to toggle debug view</p>
+          <p>Middle mouse or right-click to move character</p>
+        </div>
+      )}
+      
+      <Canvas
+        onCreated={({ gl, scene }) => {
+          console.log('Canvas created, scene:', scene)
+          scene.updateMatrixWorld(true)
+        }}
+      >
           <PerspectiveCamera makeDefault position={[8, 5, 8]} fov={75} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[3, 3, 3]} intensity={1} />
           <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
 
-          <Suspense fallback={null}>
-            {/* Add the walkable area helper */}
-            <WalkableAreaHelper />
+        <Suspense fallback={null}>
+          {/* Floor detector component to find the floor mesh */}
+          <FloorDetector onFloorDetected={handleFloorDetected} />
+          
+          {/* Debug helper */}
+          {debugMode && floorMesh && <DebugHelper floorMesh={floorMesh} />}
+          
+          {/* Add the walkable area helper */}
+          {debugMode && <WalkableAreaHelper />}
+          
+          <group 
+            ref={groupRef} 
+            position={[0, 0, 0]} 
+            rotation={[0, Math.PI * 0.65, 0]}
+            onUpdate={(self) => {
+              self.updateMatrixWorld(true)
+            }}
+          >
+            {/* Back wall */}
+            <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
+              <boxGeometry args={[10, 4, 0.2]} />
+              <meshStandardMaterial color="#ADD8E6" />
+            </mesh>
             
-            {/* Add the character */}
-            <Character position={[0, -1.5, 0]} />
+            {/* Right wall */}
+            <mesh position={[5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
+              <boxGeometry args={[10, 4, 0.2]} />
+              <meshStandardMaterial color="#ADD8E6" />
+            </mesh>
             
-            <group position={[0, 0, 0]} rotation={[0, Math.PI * 0.65, 0]}>
-              {/* Back wall */}
-              <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
-                <boxGeometry args={[10, 4, 0.2]} />
-                <meshStandardMaterial color="#ADD8E6" />
-              </mesh>
-              {/* Right wall */}
-              <mesh position={[5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-                <boxGeometry args={[10, 4, 0.2]} />
-                <meshStandardMaterial color="#ADD8E6" />
-              </mesh>
-              
-              {/* Floor */}
-              <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <boxGeometry args={[10, 10, 0.2]} />
-                <meshStandardMaterial color="#4A6C8A" />
-              </mesh>
-              
-              {/* TV Stand */}
-              <ModelLoader
-                modelPath="/models/TV_stand.obj"
-                mtlPath="/models/TV_stand.mtl"
-                position={[-3, -2, -4.4]}
-                rotation={[0, -Math.PI/2, 0]}
-                scale={1.5}
-              />
+            {/* Floor - IMPORTANT: This must be present for character movement */}
+            <WoodFloor />
+            
+            {/* Character - only render when floor is detected */}
+            {floorMesh && <Character floorMesh={floorMesh} />}
+            
+            {/* TV Stand */}
+            <ModelLoader
+              modelPath="/models/TV_stand.obj"
+              mtlPath="/models/TV_stand.mtl"
+              position={[-3, -2, -4.4]}
+              rotation={[0, -Math.PI/2, 0]}
+              scale={1.5}
+            />
 
               {/* TV */}
               <TVModel
@@ -537,7 +569,7 @@ export default function RoomScene() {
                 materialColor="#2D1B3C"
               />
               
-              {/* Left curtain - rotated 90 degrees */}
+              {/* Left curtain */}
               <ModelLoader
                 modelPath="/models/curtains.obj"
                 mtlPath="/models/curtains.mtl"
@@ -545,6 +577,7 @@ export default function RoomScene() {
                 rotation={[0, -Math.PI / 2, 0]}
                 scale={1.1}
               />
+            
               {/* Window */}
               <ModelLoader
                 modelPath="/models/window.obj"
@@ -570,6 +603,18 @@ export default function RoomScene() {
             enableZoom={true}
             enableRotate={true}
             minDistance={2}
+          maxDistance={20}
+          mouseButtons={{
+            LEFT: THREE.MOUSE.ROTATE,    // Rotate camera around target
+            MIDDLE: THREE.MOUSE.PAN,     // Pan camera freely
+            RIGHT: THREE.MOUSE.NONE      // Reserved for character movement
+          }}
+          screenSpacePanning={true}      // Enable screen space panning
+          panSpeed={1.5}                 // Adjust pan speed
+          target0={[0, 0, 0]}           // Initial target position
+          position0={[8, 5, 8]}         // Initial camera position
+          enableDamping={true}          // Smooth camera movement
+          dampingFactor={0.05}          // Adjust damping strength
           />
         </Canvas>
       </div>
@@ -584,185 +629,6 @@ export default function RoomScene() {
           flex-direction: column;
         }
       `}</style>
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
-        <Cloud />
-      </div>
-      
-      {debugMode && (
-        <div style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          background: 'rgba(0,0,0,0.7)',
-          color: 'white',
-          padding: 10,
-          borderRadius: 5,
-          fontFamily: 'monospace',
-          zIndex: 1000
-        }}>
-          <p>Floor Detected: {floorMesh ? 'Yes' : 'No'}</p>
-          <p>Press 'D' to toggle debug view</p>
-          <p>Middle mouse or right-click to move character</p>
-        </div>
-      )}
-      
-      <Canvas
-        onCreated={({ gl, scene }) => {
-          console.log('Canvas created, scene:', scene)
-          scene.updateMatrixWorld(true)
-        }}
-      >
-        <PerspectiveCamera makeDefault position={[8, 5, 8]} fov={75} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[3, 3, 3]} intensity={1} />
-        <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
-
-        <Suspense fallback={null}>
-          {/* Floor detector component to find the floor mesh */}
-          <FloorDetector onFloorDetected={handleFloorDetected} />
-          
-          {/* Debug helper */}
-          {debugMode && floorMesh && <DebugHelper floorMesh={floorMesh} />}
-          
-          {/* Add the walkable area helper */}
-          {debugMode && <WalkableAreaHelper />}
-          
-          <group 
-            ref={groupRef} 
-            position={[0, 0, 0]} 
-            rotation={[0, Math.PI * 0.65, 0]}
-            onUpdate={(self) => {
-              self.updateMatrixWorld(true)
-            }}
-          >
-            {/* Back wall */}
-            <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
-              <boxGeometry args={[10, 4, 0.2]} />
-              <meshStandardMaterial color="#ADD8E6" />
-            </mesh>
-            
-            {/* Right wall */}
-            <mesh position={[5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-              <boxGeometry args={[10, 4, 0.2]} />
-              <meshStandardMaterial color="#ADD8E6" />
-            </mesh>
-            
-            {/* Floor - IMPORTANT: This must be present for character movement */}
-            <WoodFloor />
-            
-            {/* Character - only render when floor is detected */}
-            {floorMesh && <Character floorMesh={floorMesh} />}
-            
-            {/* TV Stand */}
-            <ModelLoader
-              modelPath="/models/TV_stand.obj"
-              mtlPath="/models/TV_stand.mtl"
-              position={[-3, -2, -4.4]}
-              rotation={[0, -Math.PI/2, 0]}
-              scale={1.5}
-            />
-
-            {/* TV */}
-            <TVModel
-              position={[-3, -0.8, -4.4]}
-              rotation={[0, -Math.PI/2, 0]}
-              scale={1.5}
-            />
-
-            {/* Carpet */}
-            <ModelLoader
-              modelPath="/models/carpet.obj"
-              mtlPath="/models/carpet.mtl"
-              position={[1.1, -1.8, 0]}
-              rotation={[0, 0, 0]}
-              scale={3}
-            />
-
-            {/* Table */}
-            <ModelLoader
-              modelPath="/models/table.obj"
-              mtlPath="/models/table.mtl"
-              position={[1.1, -1.8, 0.2]}
-              rotation={[0, Math.PI/2, 0]}
-              scale={2}
-            />
-
-            {/* Tall Flower */}
-            <ModelLoader
-              modelPath="/models/tall_flower.obj"
-              mtlPath="/models/tall_flower.mtl"
-              position={[4, -1.9, -4]}
-              rotation={[0, 0, 0]}
-              scale={1.5}
-            />
-
-            {/* Wall Lamp */}
-            <ModelLoader
-              modelPath="/models/wall_lamp.obj"
-              mtlPath="/models/wall_lamp.mtl"
-              position={[4.0, 1.5, -4.9]}
-              rotation={[0, -Math.PI/2, 0]}
-              scale={1.5}
-            />
-
-            {/* Rack */}
-            <GLBModel
-              url="/models/rack1.glb"
-              position={[4.6, -2, 0]}
-              rotation={[0, -Math.PI/2, 0]}
-              scale={2}
-              materialColor="#2D1B3C"
-            />
-            
-            {/* Left curtain */}
-            <ModelLoader
-              modelPath="/models/curtains.obj"
-              mtlPath="/models/curtains.mtl"
-              position={[1, -1.8, -4.3]}
-              rotation={[0, -Math.PI / 2, 0]}
-              scale={1.1}
-            />
-            
-            {/* Window */}
-            <ModelLoader
-              modelPath="/models/window.obj"
-              mtlPath="/models/window.mtl"
-              position={[1, -1.8, -4.7]}  
-              rotation={[0, -Math.PI/2, 0]}
-              scale={1.1}
-            />
-
-            {/* Sofa */}
-            <ModelLoader
-              modelPath="/models/sofa.obj"
-              mtlPath="/models/sofa.mtl"
-              position={[1, -2, -3.7]}
-              rotation={[0, -Math.PI/2, 0]}
-              scale={1.8}
-            />
-          </group>
-        </Suspense>
-        
-        <OrbitControls 
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          minDistance={2}
-          maxDistance={20}
-          mouseButtons={{
-            LEFT: THREE.MOUSE.ROTATE,    // Rotate camera around target
-            MIDDLE: THREE.MOUSE.PAN,     // Pan camera freely
-            RIGHT: THREE.MOUSE.NONE      // Reserved for character movement
-          }}
-          screenSpacePanning={true}      // Enable screen space panning
-          panSpeed={1.5}                 // Adjust pan speed
-          target0={[0, 0, 0]}           // Initial target position
-          position0={[8, 5, 8]}         // Initial camera position
-          enableDamping={true}          // Smooth camera movement
-          dampingFactor={0.05}          // Adjust damping strength
-        />
-      </Canvas>
     </div>
   )
 } 
