@@ -1,3 +1,4 @@
+
 # Cure Me Baby👇
 **AI Psychiatrist in a TEE with Gensyn Swarm and NEAR Subscription**
 
@@ -225,4 +226,5 @@ Here's a quick reference to the major directories and files in this project, alo
 - **Tan Zhi Wei**  
   - *Role*: Frontend Developer & UI/UX Design  
   - [LinkedIn](https://www.linkedin.com/in/tanzhiwei0328/)
+
 
