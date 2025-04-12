@@ -36,9 +36,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+
+/smartcontract/build
+
+/smartcontract/node_modules
+
 # data directories
 /data
 /ai-prompts
+
+
 
 # qdrant storage
 /qdrant_storage

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import styles from './Cloud.module.css';
+import styles from '../styles/Cloud.module.css';
 
 const Cloud = () => {
   const canvasRef = useRef(null);
