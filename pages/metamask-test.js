@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useWalletSelector } from '@near-wallet-selector/react-hook';
-import styles from '../styles/app.module.css';
 import { ConnectWallet } from '../components/ConnectWallet';
 import { NetworkId } from '../config';
 
@@ -8,58 +7,39 @@ import { NetworkId } from '../config';
 const SUBSCRIPTION_CONTRACT = 'smartcontract3.testnet';
 
 export default function MetaMaskTest() {
-  const { signedAccountId, viewFunction, callFunction } = useWalletSelector();
+  const { signedAccountId, viewFunction, callFunction, activeWalletId } = useWalletSelector();
   
-  const [nearWallet, setNearWallet] = useState(null);
-  const [ethWallet, setEthWallet] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [contractChecked, setContractChecked] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isMetaMaskConnected, setIsMetaMaskConnected] = useState(false);
 
   useEffect(() => {
     // Set login status based on NEAR wallet
     setLoggedIn(!!signedAccountId);
     
     if (signedAccountId) {
-      setNearWallet(signedAccountId);
-      
       // Only check contract once when wallet connects
       if (!contractChecked) {
         setContractChecked(true);
       }
+      
+      // Check if connected via MetaMask
+      setIsMetaMaskConnected(activeWalletId?.includes('ethereum'));
     }
-  }, [signedAccountId, contractChecked]);
-  
-  // Function to connect to MetaMask
-  const connectMetaMask = async () => {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setEthWallet(accounts[0]);
-        
-        // Listen for account changes
-        window.ethereum.on('accountsChanged', (accounts) => {
-          setEthWallet(accounts[0] || null);
-        });
-      } catch (error) {
-        console.error("Error connecting to MetaMask:", error);
-      }
-    } else {
-      alert("MetaMask is not installed. Please install it to use this feature.");
-    }
-  };
-  
-  // Function to disconnect from MetaMask
-  const disconnectMetaMask = async () => {
-    setEthWallet(null);
-  };
+  }, [signedAccountId, contractChecked, activeWalletId]);
   
   // Function to subscribe by paying NEAR
   const subscribe = async () => {
     if (!signedAccountId) {
-      alert("Please connect to NEAR wallet first");
+      alert("Please connect your wallet first");
       return;
+    }
+    
+    // Check if using MetaMask and show warning
+    if (isMetaMaskConnected) {
+      alert("MetaMask is connected, but direct contract calls may not work correctly. For best results, use a NEAR native wallet like MyNearWallet.");
     }
     
     setShowSpinner(true);
@@ -80,11 +60,14 @@ export default function MetaMaskTest() {
       alert("Successfully subscribed!");
     } catch (error) {
       console.error("Error subscribing:", error);
+      
       // Extract the error message from the error object
       let errorMsg = "Failed to subscribe. See console for details.";
       
       if (error.message && error.message.includes("cannot read property 'keyPrefix'")) {
         errorMsg = "The subscription contract has not been initialized properly. Please contact the administrator.";
+      } else if (error.message && error.message.includes("External transactions to internal accounts cannot include data")) {
+        errorMsg = "MetaMask cannot directly call NEAR contracts. Please use a NEAR native wallet instead.";
       }
       
       setErrorMessage(errorMsg);
@@ -95,64 +78,56 @@ export default function MetaMaskTest() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Subscription Demo</h1>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">Subscription Demo</h1>
       
-      <div className={styles.walletSection}>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <ConnectWallet />
         
-        {/* Connect to MetaMask section */}
-        <div className={styles.metaMaskSection}>
-          <h2>Connect to MetaMask (Optional)</h2>
-          {!ethWallet ? (
-            <button onClick={connectMetaMask} className={styles.button}>
-              Connect MetaMask
-            </button>
-          ) : (
-            <div>
-              <p>Connected: {ethWallet.substring(0, 6)}...{ethWallet.substring(ethWallet.length - 4)}</p>
-              <button onClick={disconnectMetaMask} className={styles.button}>
-                Disconnect MetaMask
-              </button>
-            </div>
-          )}
-        </div>
+        {isMetaMaskConnected && (
+          <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-4">
+            <p className="text-yellow-700">
+              ⚠️ You're connected via MetaMask. For best results with NEAR contracts, we recommend using a NEAR native wallet like MyNearWallet.
+            </p>
+          </div>
+        )}
       </div>
       
       {loggedIn && (
-        <div className={styles.subscriptionSection}>
-          <h2>Subscription Details</h2>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Subscription Details</h2>
           
-          <div className={styles.subscriptionInfo}>
-            <p>Subscription Price: 1 NEAR</p>
+          <div className="mb-6">
+            <p className="text-lg mb-2">Subscription Price: 1 NEAR</p>
             
             {errorMessage && (
-              <div className={styles.errorMessage}>
-                <p>⚠️ {errorMessage}</p>
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 my-4">
+                <p className="text-red-700">⚠️ {errorMessage}</p>
               </div>
             )}
             
             <button 
               onClick={subscribe} 
-              className={styles.button}
+              className={`bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors ${showSpinner ? 'opacity-70 cursor-not-allowed' : ''}`}
               disabled={showSpinner}
             >
               {showSpinner ? 'Processing...' : 'Subscribe Now'}
             </button>
             
-            <div className={styles.note}>
-              <p><small>Note: This will send 1 NEAR to the subscription contract.</small></p>
+            <div className="mt-4 bg-gray-50 p-3 rounded text-gray-600 text-sm">
+              <p>Note: This will send 1 NEAR to the subscription contract.</p>
             </div>
           </div>
         </div>
       )}
       
       {loggedIn && (
-        <div className={styles.contractInfo}>
-          <h3>Technical Information</h3>
-          <p>Contract Address: {SUBSCRIPTION_CONTRACT}</p>
-          <p>Network: {NetworkId}</p>
-          <p>Connected Account: {signedAccountId}</p>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-3">Technical Information</h3>
+          <p className="mb-2"><span className="font-medium">Contract Address:</span> {SUBSCRIPTION_CONTRACT}</p>
+          <p className="mb-2"><span className="font-medium">Network:</span> {NetworkId}</p>
+          <p className="mb-2"><span className="font-medium">Connected Account:</span> {signedAccountId}</p>
+          <p className="mb-2"><span className="font-medium">Wallet Type:</span> {isMetaMaskConnected ? 'MetaMask (Ethereum)' : 'NEAR Native Wallet'}</p>
         </div>
       )}
     </div>

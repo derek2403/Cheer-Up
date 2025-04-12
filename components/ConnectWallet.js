@@ -18,14 +18,15 @@ export const ConnectWallet = () => {
   }, [signedAccountId]);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container-fluid">
-        <div className="navbar-nav ml-auto">
-          <button className="btn btn-outline-primary ms-2" onClick={action}>
-            {label}
-          </button>
-        </div>
+    <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+      <div className="flex justify-end">
+        <button 
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+          onClick={action}
+        >
+          {label}
+        </button>
       </div>
-    </nav>
+    </div>
   );
 }; 
