@@ -376,39 +376,24 @@ function WalkableAreaHelper() {
 function TVModel({ position, rotation, scale }) {
   const router = useRouter()
   const [isMoving, setIsMoving] = useState(false)
-  const [currentMoveStep, setCurrentMoveStep] = useState(0)
   
   const moveToTV = () => {
     if (!isMoving) {
       setIsMoving(true)
-      setCurrentMoveStep(0)
       
-      // Convert first target position to room's coordinate system
-      const firstPos = new THREE.Vector3(1.96, -1.90, 2.41)
-      const secondPos = new THREE.Vector3(-0.62, -1.90, 3.76)
+      // Convert target position to room's coordinate system
+      const targetPos = new THREE.Vector3(-0.62, -1.90, 3.76)
       const roomRotation = Math.PI * 0.65
       
-      firstPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
-      secondPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
+      targetPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
       
-      // Trigger first movement
+      // Trigger movement
       const moveEvent = new CustomEvent('moveCharacter', {
         detail: {
-          position: firstPos,
+          position: targetPos,
           onComplete: () => {
-            // After reaching first position, move to second position
-            setCurrentMoveStep(1)
-            const secondMoveEvent = new CustomEvent('moveCharacter', {
-              detail: {
-                position: secondPos,
-                onComplete: () => {
-                  setIsMoving(false)
-                  setCurrentMoveStep(0)
-                  router.push('/chatbot')
-                }
-              }
-            })
-            window.dispatchEvent(secondMoveEvent)
+            setIsMoving(false)
+            router.push('/chatbot')
           }
         }
       })
