@@ -72,7 +72,7 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
    - Chunks are organized by type and combined
 
 3. **Answer Generation**
-   - Context and question are sent to Upstage LLM
+   - Context and question are sent to Upstage LLM (Or any LLM by API)
    - LLM generates answer based solely on provided context
    - Response is formatted based on query type
    - System indicates if information isn't found
