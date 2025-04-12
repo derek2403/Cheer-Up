@@ -1,6 +1,6 @@
 # Therapeutic Assistant - RAG-Powered Mental Health Support
 
-A Next.js application that provides compassionate, evidence-based mental health support through a therapeutic conversation interface. This project combines advanced document parsing, RAG (Retrieval-Augmented Generation) capabilities, and psychological expertise to create a supportive therapeutic experience.
+A Next.js application that provides compassionate, evidence-based mental health support through a therapeutic conversation interface. This project combines advanced document parsing, RAG (Retrieval-Augmented Generation) capabilities, and psychological expertise to create a supportive therapeutic experience. It leverages Meta's Llama 3.3 70B Instruct model through the RedPill API for high-quality, multilingual therapeutic responses.
 
 ## Features
 
@@ -93,6 +93,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
    PINECONE_API_KEY=your_pinecone_api_key
    PINECONE_INDEX_NAME=your_index_name
    OPENAI_API_KEY=your_openai_api_key
+   REDPILL_API_KEY=your_redpill_api_key
    ```
 
 4. Create a Pinecone index:
@@ -134,12 +135,20 @@ A Next.js application that provides compassionate, evidence-based mental health 
    - Model: embedding-passage
    - Dimension: 4096
 
-3. **OpenAI API**
+3. **RedPill API with Llama 3.3**
+   - Model: phala/llama-3.3-70b-instruct
+   - Base URL: https://api.redpill.ai/v1
+   - Temperature: 0.4 (balanced for empathy and accuracy)
+   - Context window: 12K tokens
+   - Multilingual support: English, German, French, Italian, Portuguese, Hindi, Spanish, and Thai
+   - Optimized for therapeutic conversation
+
+4. **OpenAI API** (alternative option)
    - Model: gpt-4o-mini
    - Temperature: 0.4 (balanced for empathy and accuracy)
    - Optimized for therapeutic conversation
 
-4. **Pinecone Vector Database**
+5. **Pinecone Vector Database**
    - Dense vector storage
    - Dimension: 4096
    - Distance: Cosine similarity
@@ -170,6 +179,8 @@ A Next.js application that provides compassionate, evidence-based mental health 
 - User-friendly modal feedback
 - Graceful fallbacks with therapeutic tone
 - Silent success for technical operations
+- Robust LLM response handling for null content prevention
+- Response structure validation and safeguards
 
 ## Security and Ethics
 
