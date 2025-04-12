@@ -1,38 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from '../styles/Header.module.css';
 import { ConnectWallet } from './ConnectWallet';
 
-export default function Header() {
+// Logo component on the left
+const Logo = () => (
+  <div className={styles.logo}>
+    <Link href="/">
+      <Image 
+        src="/cureLogo.png" 
+        alt="Cure Logo" 
+        width={24}
+        height={24}
+        priority
+        className={styles.logoImage}
+      />
+      <span className={styles.logoText}>CureMeBaby</span>
+    </Link>
+  </div>
+);
+
+// Wallet button component on the right - removing the wrapper div
+const ConnectWalletButton = () => (
+  <ConnectWallet />
+);
+
+const Header = () => {
+  // Use client-side only rendering for the header
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Return a simple placeholder during SSR to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <header className={styles.header}>
+        <div className={styles.logoContainer}></div>
+        <div className={styles.walletButtonContainer}></div>
+      </header>
+    );
+  }
+  
+  // Client-side render with full content
   return (
     <header className={styles.header}>
-      <div className={styles.headerContainer}>
-        <div className={styles.logo}>
-          <Link href="/" className="flex items-center gap-2">
-            <Image 
-              src="/cureLogo.png" 
-              alt="Cure Logo" 
-              width={30} 
-              height={30}
-              priority
-            />
-            <span>CureMeBaby</span>
-          </Link>
-        </div>
-
-        <nav className={styles.navigation}>
-          <ul className="flex gap-6">
-            <li><Link href="/room" className="font-medium text-gray-700 hover:text-blue-600 transition-colors">Room</Link></li>
-            <li><Link href="/chatbot" className="font-medium text-gray-700 hover:text-blue-600 transition-colors">Chatbot</Link></li>
-            <li><Link href="/rack" className="font-medium text-gray-700 hover:text-blue-600 transition-colors">Rack</Link></li>
-          </ul>
-        </nav>
-
-        <div className={styles.contactButton}>
-          <ConnectWallet />
-        </div>
+      <Link href="/" className={styles.logoContainer}>
+        <Logo />
+      </Link>
+      
+      <div className={styles.walletButtonContainer}>
+        <ConnectWalletButton />
       </div>
     </header>
   );
 }
+
+export default Header; 
