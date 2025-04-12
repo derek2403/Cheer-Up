@@ -1,6 +1,6 @@
 
 # Cure Me Baby👇
-**Empowering mental wellness with a gamified AI psychiatrist that delivers personalized, adaptive care and real-time progress insights in a TEE**
+**Empowering accessible mental wellness with a gamified AI psychiatrist that delivers personalized, adaptive care and real-time progress insights in a TEE(Trusted Execution Environment)**
 
 ![Logo](https://github.com/derek2403/Cheer-Up/blob/main/public/logo.png?raw=true)
 
