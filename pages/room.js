@@ -55,7 +55,7 @@ function Character({ floorMesh, onMoveComplete }) {
       
       // Initial position and scale
       fbxModel.position.set(0, -1.8, 0)
-      fbxModel.scale.set(0.01, 0.01, 0.01)
+      fbxModel.scale.set(0.012, 0.012, 0.012)
       fbxModel.rotation.y = Math.PI
       
       setModel(fbxModel)
