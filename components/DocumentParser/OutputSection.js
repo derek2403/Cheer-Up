@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 const OutputBox = ({ title, content, isRawHtml }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const baseStyle = {
     border: '1px solid #444',
     padding: '15px',
@@ -10,13 +14,43 @@ const OutputBox = ({ title, content, isRawHtml }) => {
     wordBreak: 'break-word',
     fontFamily: 'monospace',
     fontSize: '14px',
-    color: '#d4d4d4'
+    color: '#d4d4d4',
+    display: isExpanded ? 'block' : 'none'
+  };
+
+  const headerStyle = {
+    fontSize: '16px',
+    marginBottom: isExpanded ? '10px' : '0',
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    userSelect: 'none',
+    padding: '10px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '4px',
+    transition: 'background-color 0.2s'
+  };
+
+  const arrowStyle = {
+    display: 'inline-block',
+    marginRight: '10px',
+    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+    transition: 'transform 0.2s',
+    fontSize: '12px'
   };
 
   if (isRawHtml) {
     return (
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>{title}</h3>
+      <div style={{ marginBottom: '15px' }}>
+        <div 
+          style={headerStyle} 
+          onClick={() => setIsExpanded(!isExpanded)}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#333'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a2a2a'}
+        >
+          <span style={arrowStyle}>▶</span>
+          {title}
+        </div>
         <pre 
           style={baseStyle}
           dangerouslySetInnerHTML={{
@@ -34,8 +68,16 @@ const OutputBox = ({ title, content, isRawHtml }) => {
   }
 
   return (
-    <div style={{ marginBottom: '30px' }}>
-      <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>{title}</h3>
+    <div style={{ marginBottom: '15px' }}>
+      <div 
+        style={headerStyle} 
+        onClick={() => setIsExpanded(!isExpanded)}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#333'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a2a2a'}
+      >
+        <span style={arrowStyle}>▶</span>
+        {title}
+      </div>
       {title === 'HTML Output' ? (
         <div style={baseStyle}>
           <div dangerouslySetInnerHTML={{ __html: content || 'No content' }} />
@@ -54,7 +96,10 @@ export const OutputSection = ({ parsedData }) => {
 
   return (
     <div style={{ marginTop: '30px' }}>
-      <h2 style={{ fontSize: '20px', marginBottom: '15px' }}>Parsed Results</h2>
+      <h2 style={{ fontSize: '20px', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        Parsed Results
+        <span style={{ fontSize: '14px', color: '#888' }}>(click sections to expand)</span>
+      </h2>
       
       <OutputBox 
         title="HTML Output"
