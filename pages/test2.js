@@ -1,6 +1,6 @@
-import MoodTracker from '../components/MoodTracker.js';
+import MoodTracker from '../components/MoodTracker/MoodTracker.js';
 
-export default function Test2Page() {
+export default function Test2Page() {   
   const handleMoodSave = (mood) => {
     console.log('Mood saved:', mood);
     // You can do additional handling here

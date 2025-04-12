@@ -13,8 +13,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Mood and date are required' });
     }
 
-    // Path to the mood.json file
-    const filePath = path.join(process.cwd(), 'data', 'mood.json');
+    // Updated path to the mood.json file
+    const filePath = path.join(process.cwd(), 'data', 'mood', 'mood.json');
     
     // Read existing data
     let moodData = [];
