@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from '../styles/Header.module.css';
+import { ConnectWallet } from './ConnectWallet';
 
 export default function Header() {
   return (
@@ -28,9 +29,9 @@ export default function Header() {
           </ul>
         </nav>
 
-        <button className={styles.contactButton}>
-          Connect Button
-        </button>
+        <div className={styles.contactButton}>
+          <ConnectWallet />
+        </div>
       </div>
     </header>
   );
