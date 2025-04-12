@@ -22,15 +22,12 @@ export default function App({ Component, pageProps }) {
   return (
     <WalletSelectorProvider config={walletSelectorConfig}>
       <HeroUIProvider>
-        <Component {...pageProps} />
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow">
+            <Component {...pageProps} />
+          </main>
+        </div>
       </HeroUIProvider>
     </WalletSelectorProvider>
-    <HeroUIProvider>
-      <div className="flex flex-col min-h-screen">
-        <main className="flex-grow">
-          <Component {...pageProps} />
-        </main>
-      </div>
-    </HeroUIProvider>
   );
 }
