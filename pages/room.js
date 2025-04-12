@@ -11,7 +11,7 @@ import Header from '../components/Header'
 // import GalaxyBackground from '../components/GalaxyBackground'
 
 // Character component with animations and movement
-function Character({ floorMesh }) {
+function Character({ floorMesh, onMoveComplete }) {
   const characterRef = useRef()
   const mixerRef = useRef()
   const actionsRef = useRef({})
@@ -125,6 +125,32 @@ function Character({ floorMesh }) {
     }
   }, [floorMesh, gl, camera, roomRotation])
   
+  // Handle target position updates
+  useEffect(() => {
+    const handleUpdateTargetPosition = (event) => {
+      const { position } = event.detail
+      if (position && modelRef.current) {
+        targetPositionRef.current.copy(position)
+        
+        const direction = new THREE.Vector3().subVectors(
+          targetPositionRef.current,
+          modelRef.current.position
+        )
+        
+        if (direction.length() > 0.1) {
+          if (actionsRef.current.idle && actionsRef.current.walk) {
+            actionsRef.current.idle.fadeOut(0.2)
+            actionsRef.current.walk.reset().fadeIn(0.2).play()
+            isMovingRef.current = true
+          }
+        }
+      }
+    }
+    
+    window.addEventListener('updateTargetPosition', handleUpdateTargetPosition)
+    return () => window.removeEventListener('updateTargetPosition', handleUpdateTargetPosition)
+  }, [])
+  
   useFrame((state, delta) => {
     if (mixerRef.current) {
       mixerRef.current.update(delta)
@@ -143,6 +169,11 @@ function Character({ floorMesh }) {
         if (actionsRef.current.idle && actionsRef.current.walk) {
           actionsRef.current.walk.fadeOut(0.2)
           actionsRef.current.idle.reset().fadeIn(0.2).play()
+        }
+        
+        // Call onMoveComplete when movement is done
+        if (onMoveComplete) {
+          onMoveComplete()
         }
       } else {
         direction.normalize()
@@ -245,14 +276,33 @@ function DebugHelper({ floorMesh }) {
 // Either import your CSS module
 // import styles from '../styles/Room.module.css'
 
+// GLBModel component with character movement
 function GLBModel({ url, position, rotation, scale, materialColor }) {
   const { scene } = useGLTF(url)
   const router = useRouter()
+  const [isMoving, setIsMoving] = useState(false)
   
-  // Add onClick handler for the rack model
-  const handleClick = () => {
-    if (url.includes('rack1.glb')) {
-      router.push('/rack')
+  // Function to move character to position before rack transition
+  const moveToRack = () => {
+    if (url.includes('rack1.glb') && !isMoving) {
+      setIsMoving(true)
+      
+      // Convert target position to room's coordinate system
+      const targetPos = new THREE.Vector3(-1.84, -1.90, -3.00)
+      const roomRotation = Math.PI * 0.65
+      targetPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
+      
+      // Trigger character movement via global event
+      const moveEvent = new CustomEvent('moveCharacter', {
+        detail: {
+          position: targetPos,
+          onComplete: () => {
+            setIsMoving(false)
+            router.push('/rack')
+          }
+        }
+      })
+      window.dispatchEvent(moveEvent)
     }
   }
   
@@ -262,7 +312,7 @@ function GLBModel({ url, position, rotation, scale, materialColor }) {
       position={position} 
       rotation={rotation} 
       scale={scale}
-      onClick={handleClick}
+      onClick={moveToRack}
     >
       <meshStandardMaterial 
         color={materialColor}
@@ -414,6 +464,25 @@ export default function RoomScene() {
   const [floorMesh, setFloorMesh] = useState(null)
   const [debugMode, setDebugMode] = useState(false)
   const groupRef = useRef()
+  const [moveCallback, setMoveCallback] = useState(null)
+  
+  // Handle character movement events
+  useEffect(() => {
+    const handleMoveCharacter = (event) => {
+      const { position, onComplete } = event.detail
+      if (position) {
+        // Store the callback for when movement completes
+        setMoveCallback(() => onComplete)
+        // Update character target position
+        window.dispatchEvent(new CustomEvent('updateTargetPosition', { 
+          detail: { position } 
+        }))
+      }
+    }
+    
+    window.addEventListener('moveCharacter', handleMoveCharacter)
+    return () => window.removeEventListener('moveCharacter', handleMoveCharacter)
+  }, [])
   
   const handleFloorDetected = useCallback((mesh) => {
     console.log('Floor detected:', mesh)
@@ -506,7 +575,7 @@ export default function RoomScene() {
             <WoodFloor />
             
             {/* Character - only render when floor is detected */}
-            {floorMesh && <Character floorMesh={floorMesh} />}
+            {floorMesh && <Character floorMesh={floorMesh} onMoveComplete={moveCallback} />}
             
             {/* TV Stand */}
             <ModelLoader
