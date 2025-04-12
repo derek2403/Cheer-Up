@@ -395,7 +395,7 @@ Feel free to share what's on your mind, or if you prefer, you can start by uploa
                     onClick={() => removeFile(index)}
                     aria-label="Remove file"
                   >
-                    <span className={styles.emojiIcon}>❌</span>
+                    <span className={styles.emojiIcon}>✖️</span>
                   </button>
                 </div>
               ))}
