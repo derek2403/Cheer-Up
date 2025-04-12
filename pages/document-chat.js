@@ -111,7 +111,7 @@ export default function DocumentChatPage() {
             onClick={handleClearVectors}
             className="header-button clear-button"
           >
-            Reset Memory
+            Delete Vectors
           </button>
           <Link href="/">
             <button className="header-button home-button">
