@@ -158,7 +158,11 @@ export const ConnectWallet = () => {
     
     if (signedAccountId) {
       setAction(() => signOut);
-      setLabel(`Logout ${signedAccountId}`);
+      // Truncate long account names for better display
+      const displayName = signedAccountId.length > 16 
+        ? `${signedAccountId.slice(0, 10)}...${signedAccountId.slice(-6)}`
+        : signedAccountId;
+      setLabel(`Logout ${displayName}`);
       
       // Show subscription popup immediately after login if not subscribed
       checkSubscriptionStatus().then(isActive => {
@@ -176,13 +180,13 @@ export const ConnectWallet = () => {
   if (!isMounted) {
     return (
       <div>
-        <div className="flex justify-between items-center space-x-8">
+        <div className="flex justify-between items-center space-x-4">
           <div></div>
           <button
-            className="text-white font-medium py-2 px-5 rounded-full transition-all duration-300 flex items-center gap-2"
+            className="text-white font-medium py-1.5 px-4 rounded-full transition-all duration-300 flex items-center gap-1 text-sm"
           >
             Connect Wallet
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 8V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H12C12.5304 20 13.0391 19.7893 13.4142 19.4142C13.7893 19.0391 14 18.5304 14 18V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9 12H21M21 12L18 9M21 12L18 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -195,24 +199,19 @@ export const ConnectWallet = () => {
   // Client-side render
   return (
     <div>
-      <div className="flex justify-between items-center space-x-8">
+      <div className="flex justify-between items-center space-x-4">
         {/* Subscription status */}
         {isLoggedIn && isSubscribed && (
           <div 
-            className="text-sm mr-4 cursor-pointer hover:opacity-80 transition-opacity"
+            className="text-xs mr-3 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => setShowSubscriptionPopup(true)}
           >
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <svg className="-ml-0.5 mr-1 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
                 <circle cx="4" cy="4" r="3" />
               </svg>
               Subscribed
             </span>
-            {subscriptionExpiry !== 'N/A' && (
-              <p className="mt-1.5 text-xs text-gray-600">
-                Expires: {subscriptionExpiry} <span className="ml-1 text-blue-500">(Click to extend)</span>
-              </p>
-            )}
           </div>
         )}
         
@@ -220,7 +219,7 @@ export const ConnectWallet = () => {
         {isLoggedIn && !isSubscribed && (
           <button 
             onClick={() => setShowSubscriptionPopup(true)}
-            className="text-sm px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors mr-4"
+            className="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors mr-3"
           >
             Subscribe
           </button>
@@ -230,12 +229,12 @@ export const ConnectWallet = () => {
         {!isLoggedIn && <div></div>}
         
         <button
-          className="text-white font-medium py-2 px-5 rounded-full transition-all duration-300 flex items-center gap-2"
+          className="text-white font-medium py-1.5 px-4 rounded-full transition-all duration-300 flex items-center gap-1 text-sm"
           onClick={action}
         >
           {label}
           {!isLoggedIn && (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 8V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H12C12.5304 20 13.0391 19.7893 13.4142 19.4142C13.7893 19.0391 14 18.5304 14 18V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9 12H21M21 12L18 9M21 12L18 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -258,9 +257,9 @@ export const ConnectWallet = () => {
       )}
       
       {isLoggedIn && isMetaMaskConnected && (
-        <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-4">
-          <p className="text-yellow-700 text-sm">
-            ⚠️ You're connected via MetaMask. For best results with NEAR contracts, we recommend using a NEAR native wallet.
+        <div className="mt-2 bg-yellow-50 border-l-4 border-yellow-500 p-2 text-xs">
+          <p className="text-yellow-700">
+            ⚠️ Using MetaMask. For best results, we recommend a NEAR native wallet.
           </p>
         </div>
       )}

@@ -11,8 +11,8 @@ const Logo = () => (
       <Image 
         src="/cureLogo.png" 
         alt="Cure Logo" 
-        width={30} 
-        height={30}
+        width={24}
+        height={24}
         priority
         className={styles.logoImage}
       />
