@@ -412,7 +412,7 @@ function WoodFloor() {
 export default function RoomScene() {
   const router = useRouter()
   const [floorMesh, setFloorMesh] = useState(null)
-  const [debugMode, setDebugMode] = useState(true)
+  const [debugMode, setDebugMode] = useState(false)
   const groupRef = useRef()
   
   const handleFloorDetected = useCallback((mesh) => {
