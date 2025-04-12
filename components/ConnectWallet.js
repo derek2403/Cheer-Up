@@ -192,15 +192,58 @@ export const ConnectWallet = () => {
   // Client-side render
   return (
     <div className="flex items-center gap-2">
-      {/* For non-subscribed users, show a subscribe button after login */}
-      {isLoggedIn && !isSubscribed && (
-        <button 
-          onClick={() => setShowSubscriptionPopup(true)}
-          className="mr-2 text-base px-5 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-full transition-colors font-medium hover:shadow-sm border border-gray-200 transform hover:-translate-y-0.5"
-        >
-          Subscribe
-        </button>
-      )}
+      <div className="flex flex-col">
+        {/* Subscription status indicator when subscribed */}
+        {isLoggedIn && isSubscribed && (
+          <div className="mr-2 flex flex-col">
+            {/* Non-clickable status indicator */}
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+              <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                <circle cx="4" cy="4" r="3" />
+              </svg>
+              Subscribed
+            </span>
+            
+            {/* Clickable expiration date */}
+            {subscriptionExpiry && subscriptionExpiry !== 'N/A' && (
+              <div className="flex justify-center w-full">
+                <span 
+                  className="inline-flex items-center text-xs font-medium bg-blue-50 text-blue-800 px-3 py-1 mt-1.5 rounded-full border border-blue-200 shadow-sm cursor-pointer hover:bg-blue-100 hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                  onClick={() => setShowSubscriptionPopup(true)}
+                  title="Click to manage subscription"
+                >
+                  <svg className="mr-1.5 h-2.5 w-2.5 text-blue-500" fill="currentColor" viewBox="0 0 8 8">
+                    <circle cx="4" cy="4" r="3" />
+                  </svg>
+                  Expires: <strong className="ml-1">{subscriptionExpiry}</strong>
+                  <svg className="ml-1.5 h-3 w-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* For non-subscribed users, show a subscribe button after login */}
+        {isLoggedIn && !isSubscribed && (
+          <button 
+            onClick={() => setShowSubscriptionPopup(true)}
+            className="mr-2 text-base px-5 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-full transition-colors font-medium hover:shadow-sm border border-gray-200 transform hover:-translate-y-0.5"
+          >
+            Subscribe
+          </button>
+        )}
+        
+        {/* MetaMask warning */}
+        {isLoggedIn && isMetaMaskConnected && (
+          <div className="mt-1 text-xs text-yellow-700 mr-2">
+            <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-yellow-50 border border-yellow-200">
+              ⚠️ Using MetaMask
+            </span>
+          </div>
+        )}
+      </div>
 
       <button
         onClick={action}
@@ -238,12 +281,6 @@ export const ConnectWallet = () => {
             error={error}
           />
         </Portal>
-      )}
-      
-      {isLoggedIn && isMetaMaskConnected && (
-        <div className="mt-1 text-xs text-yellow-700">
-          ⚠️ Using MetaMask
-        </div>
       )}
     </div>
   );

@@ -36,7 +36,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  min-width: 300px;
+  min-width: 320px;
+  gap: 0.5rem;
 }
 
 /* Keeping this for reference but it's not used anymore */
