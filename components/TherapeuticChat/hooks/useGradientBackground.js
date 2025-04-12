@@ -12,9 +12,9 @@ const useGradientBackground = () => {
       setGradientAngle(prev => (prev + 0.5) % 360);
       
       // Cycle through all hues (0-360) much faster
-      setHue1(prev => (prev + 10) % 360);
-      setHue2(prev => (prev + 10) % 360);
-    }, 1); // Keep the fastest possible interval
+      setHue1(prev => (prev + 2) % 360);
+      setHue2(prev => (prev + 2) % 360);
+    }, 35); // Keep the fastest possible interval
     
     return () => clearInterval(interval);
   }, []);
