@@ -12,14 +12,16 @@ class SubscriptionContract {
   constructor() {
     this.owner = '';
     this.subscriptionPrice = BigInt(0);
-    this.subscribers = new LookupMap('s');
+    this.subscribers = new LookupMap('subscribers_storage_v1');
   }
 
   @initialize({})
   init({ owner, subscriptionPrice }: { owner: string, subscriptionPrice: string }) {
     this.owner = owner;
     this.subscriptionPrice = BigInt(subscriptionPrice);
-    this.subscribers = new LookupMap('s');
+    if (!this.subscribers) {
+      this.subscribers = new LookupMap('subscribers_storage_v1');
+    }
   }
 
   @call({payableFunction: true})
@@ -61,6 +63,11 @@ class SubscriptionContract {
 
   @view({})
   isSubscribed({ accountId }: { accountId: string }): boolean {
+    if (!this.subscribers) {
+      this.subscribers = new LookupMap('subscribers_storage_v1');
+      return false;
+    }
+
     const expiry = this.subscribers.get(accountId);
     if (expiry === null) {
       return false;
@@ -72,6 +79,11 @@ class SubscriptionContract {
 
   @view({})
   getSubscriptionExpiry({ accountId }: { accountId: string }): string | null {
+    if (!this.subscribers) {
+      this.subscribers = new LookupMap('subscribers_storage_v1');
+      return null;
+    }
+
     const expiry = this.subscribers.get(accountId);
     if (expiry === null) {
       return null;
@@ -97,6 +109,11 @@ class SubscriptionContract {
 
   @call({})
   cleanupExpiredSubscriptions({ accountIds }: { accountIds: string[] }): void {
+    if (!this.subscribers) {
+      this.subscribers = new LookupMap('subscribers_storage_v1');
+      return;
+    }
+
     const now = near.blockTimestamp();
     
     for (const accountId of accountIds) {
@@ -106,5 +123,18 @@ class SubscriptionContract {
         this.subscribers.remove(accountId);
       }
     }
+  }
+
+  // Add a repair function to fix the contract if it was deployed incorrectly
+  @call({})
+  repairContract(): void {
+    // Only the owner can repair the contract
+    if (near.predecessorAccountId() !== this.owner) {
+      throw new Error('Only the owner can repair the contract');
+    }
+    
+    // Re-initialize the subscribers map with the correct prefix
+    this.subscribers = new LookupMap('subscribers_storage_v1');
+    near.log('Contract repaired successfully');
   }
 }
