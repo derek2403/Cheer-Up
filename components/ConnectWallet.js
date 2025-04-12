@@ -13,20 +13,18 @@ export const ConnectWallet = () => {
       setLabel(`Logout ${signedAccountId}`);
     } else {
       setAction(() => signIn);
-      setLabel('Login');
+      setLabel('Connect Wallet');
     }
   }, [signedAccountId]);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-      <div className="flex justify-end">
-        <button 
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
-          onClick={action}
-        >
-          {label}
-        </button>
-      </div>
+    <div>
+      <button 
+        className=" text-white font-medium py-2 px-4 rounded"
+        onClick={action}
+      >
+        {label}
+      </button>
     </div>
   );
 }; 
