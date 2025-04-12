@@ -8,7 +8,6 @@ import { useRouter } from 'next/router'
 import Cloud from '../components/cloud'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 import Header from '../components/Header'
-// import GalaxyBackground from '../components/GalaxyBackground'
 
 // Character component with animations and movement
 function Character({ floorMesh }) {
