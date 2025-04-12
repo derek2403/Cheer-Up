@@ -528,18 +528,9 @@ export default function RoomScene() {
               <ModelLoader
                 modelPath="/models/carpet.obj"
                 mtlPath="/models/carpet.mtl"
-                position={[1.1, -1.8, 0]}
+                position={[1.1, -1.95, 0]}
                 rotation={[0, 0, 0]}
                 scale={3}
-              />
-
-              {/* Table */}
-              <ModelLoader
-                modelPath="/models/table.obj"
-                mtlPath="/models/table.mtl"
-                position={[1.1, -1.8, 0.2]}
-                rotation={[0, Math.PI/2, 0]}
-                scale={2}
               />
 
               {/* Tall Flower */}
