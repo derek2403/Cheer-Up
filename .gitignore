@@ -58,3 +58,4 @@ qdrant_storage/
 # qdrant storage
 /qdrant_storage
 qdrant_storage/
+/rl-swarm/supervisor_content.txt
