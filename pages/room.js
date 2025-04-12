@@ -1,7 +1,25 @@
 import { Canvas } from '@react-three/fiber'
 import ModelLoader from '../components/ModelLoader'
-import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls, Environment, PerspectiveCamera, useGLTF } from '@react-three/drei'
 import { Suspense } from 'react'
+
+function GLBModel({ url, position, rotation, scale, materialColor }) {
+  const { scene } = useGLTF(url)
+  return (
+    <primitive 
+      object={scene} 
+      position={position} 
+      rotation={rotation} 
+      scale={scale}
+    >
+      <meshStandardMaterial 
+        color={materialColor}
+        metalness={0.5}
+        roughness={0.5}
+      />
+    </primitive>
+  )
+}
 
 export default function RoomScene() {
   return (
@@ -27,13 +45,13 @@ export default function RoomScene() {
           {/* Floor */}
           <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <boxGeometry args={[10, 10, 0.2]} />
-            <meshStandardMaterial color="#00BFFF" />
+            <meshStandardMaterial color="#6D5B8C" />
           </mesh>
           <ModelLoader
             modelPath="/models/floor_tiles.obj"
             mtlPath="/models/floor_tiles.mtl"
-            position={[0, -2, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, -2.4, 0]}
+            rotation={[0, 0, 0]}
             scale={1}
           />
           
@@ -41,8 +59,8 @@ export default function RoomScene() {
           <ModelLoader
             modelPath="/models/TV_stand.obj"
             mtlPath="/models/TV_stand.mtl"
-            position={[4.3, -2, 0]}
-            rotation={[0, Math.PI, 0]}
+            position={[-3, -2, -4.4]}
+            rotation={[0, -Math.PI/2, 0]}
             scale={1.5}
           />
 
@@ -50,36 +68,93 @@ export default function RoomScene() {
           <ModelLoader
             modelPath="/models/TV.obj"
             mtlPath="/models/TV.mtl"
-            position={[4.3, -0.8, 0]}
-            rotation={[0, Math.PI, 0]}
+            position={[-3, -0.8, -4.4]}
+            rotation={[0, -Math.PI/2, 0]}
             scale={1.5}
+          />
+
+          {/* Carpet */}
+          <ModelLoader
+            modelPath="/models/carpet.obj"
+            mtlPath="/models/carpet.mtl"
+            position={[1.1, -1.8, 0]}
+            rotation={[0, 0, 0]}
+            scale={3}
+          />
+
+          {/* Table */}
+          <ModelLoader
+            modelPath="/models/table.obj"
+            mtlPath="/models/table.mtl"
+            position={[1.1, -1.8, 0.2]}
+            rotation={[0, Math.PI/2, 0]}
+            scale={2}
+          />
+
+          {/* Tall Flower */}
+          <ModelLoader
+            modelPath="/models/tall_flower.obj"
+            mtlPath="/models/tall_flower.mtl"
+            position={[4, -1.9, -4]}
+            rotation={[0, 0, 0]}
+            scale={1.5}
+          />
+
+         
+
+          {/* Wall Lamp */}
+          <ModelLoader
+            modelPath="/models/wall_lamp.obj"
+            mtlPath="/models/wall_lamp.mtl"
+            position={[4.0, 1.5, -4.9]}
+            rotation={[0, -Math.PI/2, 0]}
+            scale={1.5}
+          />
+
+          {/* Rack */}
+          <GLBModel
+            url="/models/rack.glb"
+            position={[4.6, -2, 0]}
+            rotation={[0, -Math.PI/2, 0]}
+            scale={2}
+            materialColor="#2D1B3C"
           />
           
           {/* Left curtain - rotated 90 degrees */}
           <ModelLoader
             modelPath="/models/curtains.obj"
             mtlPath="/models/curtains.mtl"
-            position={[-3, -1.5, -4.8]}
-            rotation={[0, Math.PI / 2, 0]}
-            scale={1}
-          />
-
-          {/* Right curtain - rotated 90 degrees */}
-          <ModelLoader
-            modelPath="/models/curtains.obj"
-            mtlPath="/models/curtains.mtl"
-            position={[3, -1.5, -4.3]}
+            position={[1, -1.8, -4.3]}
             rotation={[0, -Math.PI / 2, 0]}
-            scale={1}
+            scale={1.1}
           />
           {/* Window */}
           <ModelLoader
             modelPath="/models/window.obj"
             mtlPath="/models/window.mtl"
-            position={[3, -1.5, -4.7]}  
+            position={[1, -1.8, -4.7]}  
+            rotation={[0, -Math.PI/2, 0]}
+            scale={1.1}
+          />
+
+          {/* Sofa */}
+          <ModelLoader
+            modelPath="/models/sofa.obj"
+            mtlPath="/models/sofa.mtl"
+            position={[1, -2, -3.7]}
+            rotation={[0, -Math.PI/2, 0]}
+            scale={1.8}
+          />
+
+          {/* Picture Frames */}
+          <ModelLoader
+            modelPath="/models/picture_frames.obj"
+            mtlPath="/models/picture_frames.mtl"
+            position={[4.8, 0, -4.9]}
             rotation={[0, -Math.PI/2, 0]}
             scale={1}
           />
+
         </Suspense>
         
         <OrbitControls 
