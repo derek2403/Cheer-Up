@@ -83,9 +83,15 @@ const TherapeuticChat = () => {
   };
 
   // --- Prepare Modal Content --- 
-  // We define the modal JSX separately to keep the return statement cleaner
   const modalContent = (
-    <div className={styles.modalOverlay}>
+    <div 
+      className={styles.modalOverlay}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          toggleContextModal();
+        }
+      }}
+    >
       <div className={styles.modalContent}>
         <button 
           onClick={toggleContextModal} 
@@ -127,10 +133,9 @@ const TherapeuticChat = () => {
   return (
     <div className={styles.chatbotWrapperLarge}>
       {/* --- Portal for Context Modal --- */}  
-      {/* Conditionally render the portal only when mounted and modal is shown */}
       {isMounted && showContextModal && createPortal(
-        modalContent, // The JSX we want to portal
-        document.body // The DOM node to portal into
+        modalContent,
+        document.body
       )}
       {/* --- End Portal --- */} 
 
