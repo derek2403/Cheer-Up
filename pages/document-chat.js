@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { DocumentParserComponent } from '../components/DocumentParser/DocumentParserComponent';
 
-export default function CombinedPage() {
+export default function DocumentChatPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -74,8 +74,8 @@ export default function CombinedPage() {
   return (
     <div className="container">
       <Head>
-        <title>Document Parser & Chatbot</title>
-        <meta name="description" content="Combined document parsing and chatbot demo" />
+        <title>Document Chat</title>
+        <meta name="description" content="Chat with your documents using AI" />
       </Head>
 
       <main className="main-content">
@@ -199,7 +199,6 @@ export default function CombinedPage() {
         h2 {
           font-size: 24px;
           margin-bottom: 20px;
-          color: #fff;
         }
         
         .chat-container {

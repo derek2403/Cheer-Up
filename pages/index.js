@@ -28,29 +28,12 @@ export default function Home() {
         />
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
-            Check out our{" "}
-            <Link 
-              href="/document-parser"
-              className="text-blue-500 hover:text-blue-600 underline"
-            >
-              Document Parser Demo
-            </Link>
-          </li>
-          <li className="mb-2 tracking-[-.01em]">
             Try our{" "}
             <Link 
-              href="/chatbot"
+              href="/document-chat"
               className="text-blue-500 hover:text-blue-600 underline"
             >
-              RAG Chatbot
-            </Link>
-          </li>
-          <li className="mb-2 tracking-[-.01em]">
-            <Link 
-              href="/combined"
-              className="text-blue-500 hover:text-blue-600 underline"
-            >
-              Combined Document Parser & Chatbot
+              Document Chat AI
             </Link>
           </li>
           <li className="mb-2 tracking-[-.01em]">

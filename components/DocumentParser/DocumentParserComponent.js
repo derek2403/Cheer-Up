@@ -67,7 +67,7 @@ export const DocumentParserComponent = () => {
 
   return (
     <div>
-      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Document Parser Demo</h1>
+      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Document Parser</h1>
       
       <FileUpload
         file={file}
