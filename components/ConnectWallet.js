@@ -111,18 +111,18 @@ export const ConnectWallet = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center space-x-8">
         {/* Subscription status */}
         {isLoggedIn && isSubscribed && (
-          <div className="text-sm">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <div className="text-sm mr-4">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
               <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
                 <circle cx="4" cy="4" r="3" />
               </svg>
               Subscribed
             </span>
             {subscriptionExpiry !== 'N/A' && (
-              <p className="mt-1 text-xs text-gray-600">
+              <p className="mt-1.5 text-xs text-gray-600">
                 Expires: {subscriptionExpiry}
               </p>
             )}
@@ -133,7 +133,7 @@ export const ConnectWallet = () => {
         {isLoggedIn && !isSubscribed && (
           <button 
             onClick={() => setShowSubscriptionPopup(true)}
-            className="text-sm px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors"
+            className="text-sm px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition-colors mr-4"
           >
             Subscribe
           </button>
@@ -143,7 +143,7 @@ export const ConnectWallet = () => {
         {!isLoggedIn && <div></div>}
         
         <button 
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded transition-colors ml-auto"
           onClick={action}
         >
           {label}
