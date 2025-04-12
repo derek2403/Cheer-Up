@@ -201,3 +201,117 @@ Remember to:
 2. Configure build settings
 3. Set up proper CORS headers
 4. Monitor API usage
+
+## UI Framework Setup
+
+### Tech Stack Additions
+
+- HeroUI (React UI Library)
+- Tailwind CSS 3.3.0
+- Framer Motion 11.9.0
+
+### Additional Dependencies
+
+The project now includes these UI-related dependencies:
+
+```bash
+@heroui/react
+framer-motion@^11.9.0
+tailwindcss@3.3.0
+postcss@8.4.31
+autoprefixer@10.4.14
+```
+
+### Configuration Files
+
+#### PostCSS Configuration (postcss.config.js)
+```javascript
+module.exports = {
+  plugins: {
+    'tailwindcss/nesting': {},
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+#### Tailwind CSS Configuration (tailwind.config.js)
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### HeroUI Setup
+
+The project uses HeroUI for its component library. HeroUI is configured in `pages/_app.js`:
+
+```javascript
+import "../styles/globals.css";
+import { HeroUIProvider } from "@heroui/react";
+
+export default function App({ Component, pageProps }) {
+  return (
+    <HeroUIProvider>
+      <Component {...pageProps} />
+    </HeroUIProvider>
+  );
+}
+```
+
+### Global Styles
+
+Global styles are configured in `styles/globals.css`:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: #ffffff;
+}
+```
+
+### Using HeroUI Components
+
+You can import and use HeroUI components in your pages or components:
+
+```javascript
+import { Button } from "@heroui/react";
+
+function MyComponent() {
+  return <Button>Click me</Button>;
+}
+```
+
+### UI Development Notes
+
+- The project uses legacy peer dependencies due to some package version conflicts
+- HeroUI components are automatically styled with Tailwind CSS
+- Custom styles can be added through Tailwind CSS classes or global CSS
+- All HeroUI components are accessible out of the box
+- Built-in animations are powered by Framer Motion
