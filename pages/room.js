@@ -87,7 +87,6 @@ export default function RoomScene() {
           enableZoom={true}
           enableRotate={true}
           minDistance={2}
-          maxDistance={10}
         />
       </Canvas>
     </div>
