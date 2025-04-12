@@ -129,6 +129,14 @@ export function DocumentParserComponent() {
       {uploadSuccess && (
         <div className="success-message">
           ✅ Document processed successfully! I'll use this information to provide more personalized support.
+          <div className="help-text">
+            You can now ask questions about your document, such as:
+            <ul>
+              <li>"What metaphor did I use to describe emotional pain?"</li>
+              <li>"What feelings did I express in my journal?"</li>
+              <li>"Summarize my journal entry"</li>
+            </ul>
+          </div>
         </div>
       )}
 
@@ -216,6 +224,21 @@ export function DocumentParserComponent() {
           border-left: 3px solid #22c55e;
           color: #86efac;
           border-radius: 4px;
+        }
+
+        .help-text {
+          margin-top: 12px;
+          font-size: 14px;
+          color: #a5b4fc;
+        }
+
+        .help-text ul {
+          margin-top: 8px;
+          margin-left: 20px;
+        }
+
+        .help-text li {
+          margin-bottom: 4px;
         }
       `}</style>
     </div>

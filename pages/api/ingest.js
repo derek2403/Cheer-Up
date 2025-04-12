@@ -67,15 +67,51 @@ export default async function handler(req, res) {
           return chunks;
         }
         
+        // Add source document ID and classification to each chunk's metadata
+        const text = el.text.trim();
+        // Skip empty chunks
+        if (!text) return null;
+        
         return [{
-          text: el.text.trim(),
-          tag: el.tagName.toLowerCase()
+          text: text,
+          tag: el.tagName.toLowerCase(),
+          source: 'user-document',
+          document_id: documentId,
+          timestamp: new Date().toISOString()
         }];
       })
       .flat()
-      .filter(chunk => chunk.text.length > 0);
+      .filter(chunk => chunk !== null && chunk.text && chunk.text.length > 0);
 
-    if (chunks.length === 0) {
+    // Create semantic chunks for better retrieval
+    // Combine paragraphs that are too short (<40 chars) with the next paragraph
+    const semanticChunks = [];
+    let currentChunk = null;
+    
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      
+      if (!currentChunk) {
+        currentChunk = { ...chunk };
+        continue;
+      }
+      
+      // If current chunk is short, combine it with the next one
+      if (currentChunk.text.length < 40 && i < chunks.length - 1) {
+        currentChunk.text += "\n" + chunk.text;
+        currentChunk.tag += "+" + chunk.tag;
+      } else {
+        semanticChunks.push(currentChunk);
+        currentChunk = { ...chunk };
+      }
+    }
+    
+    // Add the last chunk if it exists
+    if (currentChunk) {
+      semanticChunks.push(currentChunk);
+    }
+    
+    if (semanticChunks.length === 0) {
       return res.status(400).json({ error: 'No text content found in HTML' });
     }
 
@@ -83,8 +119,8 @@ export default async function handler(req, res) {
     const batchSize = 100;
     const allEmbeddings = [];
     
-    for (let i = 0; i < chunks.length; i += batchSize) {
-      const batchChunks = chunks.slice(i, i + batchSize).map(chunk => chunk.text);
+    for (let i = 0; i < semanticChunks.length; i += batchSize) {
+      const batchChunks = semanticChunks.slice(i, i + batchSize).map(chunk => chunk.text);
       
       const response = await fetch('https://api.upstage.ai/v1/embeddings', {
         method: 'POST',
@@ -119,9 +155,10 @@ export default async function handler(req, res) {
         id: id,
         vector: embedding.embedding,
         payload: {
-          text: chunks[idx].text,
-          tag: chunks[idx].tag,
+          text: semanticChunks[idx].text,
+          tag: semanticChunks[idx].tag,
           doc_id: documentId,
+          source: semanticChunks[idx].source || 'user-document',
           chunk_index: idx,
           timestamp: new Date().toISOString()
         }
@@ -143,7 +180,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ 
       success: true, 
-      chunksProcessed: chunks.length,
+      chunksProcessed: semanticChunks.length,
       results: upsertResults
     });
   } catch (error) {

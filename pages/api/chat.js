@@ -41,25 +41,53 @@ export default async function handler(req, res) {
     // 3. Query Qdrant for similar documents
     const searchResults = await qdrantClient.search(queryEmbedding, 15);
     
+    // Add detailed logging
+    console.log('RAG Search Results:', JSON.stringify({
+      totalResults: searchResults.length,
+      scores: searchResults.map(match => match.score),
+      samples: searchResults.slice(0, 3).map(match => ({
+        score: match.score,
+        text: match.payload.text.substring(0, 100) + '...'
+      }))
+    }, null, 2));
+    
     // 4. Process and organize the retrieved chunks
+    // Use a lower threshold for queries about personal information like metaphors
+    const isPersonalInfoQuery = query.toLowerCase().includes('metaphor') || 
+                               query.toLowerCase().includes('what did i say') || 
+                               query.toLowerCase().includes('what i wrote') ||
+                               query.toLowerCase().includes('remind me');
+                               
+    const similarityThreshold = isPersonalInfoQuery ? 0.3 : 0.5; // Much lower threshold for personal info
+    
+    console.log('Query type:', { isPersonalInfoQuery, similarityThreshold });
+    
     const contextChunks = searchResults
-      .filter(match => match.score > 0.7) // Only use high-quality matches
+      .filter(match => match.score > similarityThreshold)
       .map(match => match.payload.text);
+      
+    console.log('After filtering:', {
+      filteredCount: contextChunks.length,
+      firstChunkPreview: contextChunks.length > 0 ? contextChunks[0].substring(0, 100) + '...' : 'No chunks passed filter'
+    });
 
     // Group related chunks together
     const tableSummaries = contextChunks.filter(chunk => chunk.startsWith('This table compares'));
     const tableRows = contextChunks.filter(chunk => chunk.includes(': '));
     
     // Combine chunks in a meaningful way
-    const context = [
-      ...tableSummaries,
-      ...tableRows
-    ].join('\n\n');
+    const context = contextChunks.join('\n\n');
 
     // Even if there's no context, a therapist should still be able to respond
     let therapeuticContext = context.trim();
     if (!therapeuticContext) {
-      therapeuticContext = "The user is seeking therapeutic guidance. Even without specific psychological reference materials, respond as a compassionate therapist would, drawing on your general knowledge of therapeutic approaches and mental health support strategies.";
+      if (isPersonalInfoQuery) {
+        therapeuticContext = "IMPORTANT: The user is asking about a specific personal detail (like a metaphor) but no relevant content was found in the vector database. This could mean: 1) The document containing this information was never uploaded, 2) The document was not properly embedded, or 3) The similarity search failed to retrieve it due to semantic mismatch. Suggest they try uploading the document again if they believe it should be there. DO NOT definitively state the information doesn't exist - instead say you don't see the metaphor in the current context but would love to discuss it further.";
+      } else {
+        therapeuticContext = "The user is seeking therapeutic guidance. Even without specific psychological reference materials, respond as a compassionate therapist would, drawing on your general knowledge of therapeutic approaches and mental health support strategies.";
+      }
+    } else {
+      therapeuticContext = "The following information has been retrieved from the user's uploaded documents. This content is HIGHLY RELEVANT to their query and should be directly referenced in your response:\n\n" + therapeuticContext;
     }
 
     // Get conversation history from the request
@@ -86,6 +114,14 @@ You are a world-class clinical psychologist and mental health expert with over 3
   Use inclusive language that respects diverse backgrounds, identities, and experiences. Avoid technical jargon unless you explain it clearly or use analogies that make complex concepts easy to grasp.
 - **Supportive Authority:**  
   As a licensed and experienced psychologist, your insights carry clinical weight. You provide professional therapeutic guidance directly to the individual you're helping.
+
+### RAG Retrieval Guidelines (VERY IMPORTANT):
+- Always prioritize retrieved document content over general knowledge
+- If the user asks about specific content they've shared (e.g., "What metaphor did I use for X?"), you MUST quote directly from their documents
+- If you find relevant content in the context, include exact quotes or paraphrases
+- If no relevant document content is found, explicitly state: "I couldn't find that specific information in your uploaded documents" before giving a general response
+- Never substitute general information when specific uploaded content is available
+- All user-uploaded documents should be treated as highly personal and directly relevant to their questions
 
 ### Important Note About First Interactions:
 When the user first messages you or provides limited information, NEVER respond that you don't have enough information. Instead:
@@ -148,7 +184,7 @@ Remember to conclude your response with an invitation for further discussion, re
       messages: [
         { 
           role: 'system', 
-          content: 'You are a highly skilled, compassionate psychologist with decades of experience in various therapeutic modalities. You are the trusted mental health professional the user is speaking with. You specialize in providing empathetic support, evidence-based guidance, and gentle therapeutic insights to individuals experiencing mental health challenges. Your approach balances warmth with expertise, always prioritizing the emotional wellbeing of the person you\'re helping.\n\nVERY IMPORTANT FORMATTING INSTRUCTIONS:\n- Use double line breaks between paragraphs for readability\n- Add bold formatting (**title**) for section headings and important concepts\n- Format numbered lists with proper spacing\n- Break up text into multiple paragraphs instead of long blocks\n- Use bullet points for lists of suggestions or techniques\n- Add clear visual structure to make your responses easy to read'
+          content: 'You are a highly skilled, compassionate psychologist with decades of experience in various therapeutic modalities. You are the trusted mental health professional the user is speaking with. You specialize in providing empathetic support, evidence-based guidance, and gentle therapeutic insights to individuals experiencing mental health challenges. Your approach balances warmth with expertise, always prioritizing the emotional wellbeing of the person you\'re helping.\n\nVERY IMPORTANT RETRIEVAL INSTRUCTIONS:\n- Always prioritize retrieved document content over general knowledge\n- If the user asks about specific content they\'ve shared (e.g., "What metaphor did I use?"), you MUST directly quote from their documents\n- If the user asks about something specific that is NOT in context but might be in their documents, say "I don\'t see a specific metaphor for emotional pain in our current context, but I\'d love to discuss this further"\n- Never definitively state "I couldn\'t find that information" for personal details unless you\'re certain it\'s not in the context\n- If you see ANY metaphors or descriptive language about emotions in the context, prioritize showing these to the user when they ask about their metaphors\n- Assume the user\'s documents contain important personal details - make every effort to find relevant content\n\nVERY IMPORTANT FORMATTING INSTRUCTIONS:\n- Use double line breaks between paragraphs for readability\n- Add bold formatting (**title**) for section headings and important concepts\n- Format numbered lists with proper spacing\n- Break up text into multiple paragraphs instead of long blocks\n- Use bullet points for lists of suggestions or techniques\n- Add clear visual structure to make your responses easy to read'
         },
         ...conversationMessages,
         { role: 'user', content: prompt }
