@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import ModelLoader from '../components/ModelLoader'
-import { OrbitControls, Environment, PerspectiveCamera, useGLTF, Sky } from '@react-three/drei'
+import { OrbitControls, Environment, PerspectiveCamera, useGLTF, Sky, useTexture } from '@react-three/drei'
 import { Suspense, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
 import { useRouter } from 'next/router'
@@ -90,6 +90,56 @@ function TVModel({ position, rotation, scale }) {
   )
 }
 
+// Wood Floor component with procedural texture
+function WoodFloor() {
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `
+
+  const fragmentShader = `
+    varying vec2 vUv;
+    
+    float random(vec2 st) {
+      return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+    
+    void main() {
+      // Create wood grain pattern
+      vec2 st = vUv * 10.0;
+      float woodGrain = random(floor(st * vec2(1.0, 10.0)));
+      
+      // Create plank lines
+      float plankWidth = 0.1; // Width of each plank
+      float plankLine = step(mod(vUv.y * 5.0, plankWidth), 0.002); // Horizontal lines
+      float verticalLine = step(mod(vUv.x * 5.0, 1.0), 0.002); // Vertical lines at plank edges
+      
+      // Mix colors
+      vec3 woodColor = mix(
+        vec3(0.82, 0.70, 0.54), // Light wood color
+        vec3(0.72, 0.60, 0.44), // Darker wood color
+        woodGrain * 0.3 + plankLine + verticalLine
+      );
+      
+      gl_FragColor = vec4(woodColor, 1.0);
+    }
+  `
+
+  return (
+    <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <boxGeometry args={[10, 10, 0.2]} />
+      <shaderMaterial
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  )
+}
+
 export default function RoomScene() {
   const router = useRouter()
   
@@ -123,10 +173,7 @@ export default function RoomScene() {
             </mesh>
             
             {/* Floor */}
-            <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <boxGeometry args={[10, 10, 0.2]} />
-              <meshStandardMaterial color="#000000" />
-            </mesh>
+            <WoodFloor />
             
             {/* TV Stand */}
             <ModelLoader
