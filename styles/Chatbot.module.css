@@ -89,15 +89,19 @@
   margin-bottom: 12px;
   display: flex;
   align-items: center;
-  padding: 7px 12px;
-  background: rgba(0, 131, 176, 0.05);
-  border-radius: 10px;
-  transition: transform 0.2s, background 0.2s;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 131, 176, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 131, 176, 0.05);
 }
 
 .contextList li:hover {
   transform: translateX(5px);
-  background: rgba(0, 131, 176, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 131, 176, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 131, 176, 0.1);
 }
 
 .emojiIcon {
@@ -111,10 +115,11 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 25px;
-  background: rgba(0, 131, 176, 0.05);
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: 1px dashed rgba(0, 131, 176, 0.3);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 131, 176, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 131, 176, 0.05);
 }
 
 .securityNote {
@@ -125,22 +130,24 @@
 }
 
 .contextDropZone {
-  border: 2px dashed rgba(0, 131, 176, 0.4);
+  border: 2px dashed rgba(0, 131, 176, 0.3);
   border-radius: 16px;
   padding: 30px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: rgba(0, 131, 176, 0.05);
+  background: rgba(255, 255, 255, 0.8);
   margin-bottom: 22px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 131, 176, 0.05);
 }
 
 .contextDropZone:hover, .contextDropZone.dragging {
-  border-color: rgba(0, 131, 176, 0.8);
-  background: rgba(0, 131, 176, 0.1);
+  border-color: rgba(0, 131, 176, 0.6);
+  background: rgba(255, 255, 255, 0.95);
   transform: scale(1.01);
+  box-shadow: 0 4px 8px rgba(0, 131, 176, 0.1);
 }
 
 .uploadIconContainer {
@@ -738,7 +745,7 @@
   bottom: 0; 
   width: 100vw; 
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7); /* Slightly darker */
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -746,41 +753,70 @@
 }
 
 .modalContent {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 16px; /* More rounded */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  max-width: 650px; /* Slightly wider */
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px 30px 30px 24px;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  max-width: 650px;
   width: 90%;
-  max-height: 90vh; 
-  overflow-y: auto; 
+  max-height: 90vh;
   position: relative;
-  /* Add entrance animation */
   animation: modalFadeIn 0.3s ease-out;
+  overflow-y: overlay;
+  scrollbar-width: thin;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.modalContent::-webkit-scrollbar {
+  width: 6px;
+  height: calc(100% - 44px);
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 22px 0;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: rgba(0, 131, 176, 0.15);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 131, 176, 0.25);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .modalCloseButton {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: #eee;
+  top: 20px;
+  right: 20px;
+  background: rgba(238, 238, 238, 0.8);
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 24px;
   color: #555;
   cursor: pointer;
-  line-height: 1;
-  transition: background-color 0.2s, color 0.2s;
+  line-height: 0;
+  padding-bottom: 4px;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
 }
 
 .modalCloseButton:hover {
-  background-color: #ddd;
+  background-color: rgba(221, 221, 221, 0.9);
   color: #333;
+  transform: scale(1.05);
 }
 
 /* Modal Animation */
