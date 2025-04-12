@@ -10,36 +10,31 @@
   },
   "dependencies": {
     "@heroui/react": "^2.7.6",
-    "@react-three/drei": "^10.0.6",
-    "@react-three/fiber": "^9.1.2",
-
     "@near-wallet-selector/ethereum-wallets": "^8.10.1",
     "@near-wallet-selector/modal-ui": "^8.10.1",
     "@near-wallet-selector/my-near-wallet": "^8.10.1",
     "@near-wallet-selector/react-hook": "^8.10.1",
-    "@wagmi/core": "^2.16.7",
-    "@web3modal/wagmi": "^5.1.11",
     "near-api-js": "^5.1.1",
-
     "@pinecone-database/pinecone": "^5.1.1",
     "@qdrant/js-client-rest": "^1.13.0",
+    "@react-three/drei": "^10.0.6",
+    "@react-three/fiber": "^9.1.2",
+    "@wagmi/core": "^2.16.7",
+    "@web3modal/wagmi": "^5.1.11",
     "dotenv": "^16.5.0",
     "form-data": "^4.0.2",
     "formidable": "^3.5.2",
-    "framer-motion": "^11.9.0",
-
+    "framer-motion": "^12.6.5",
     "next": "15.3.0",
     "node-fetch": "^2.7.0",
     "node-html-parser": "^7.0.1",
     "openai": "^4.93.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
     "three": "^0.175.0",
-
     "viem": "^2.26.3",
-    "wagmi": "^2.14.16",
-
-    "react-dropzone": "^14.3.8"
+    "wagmi": "^2.14.16"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

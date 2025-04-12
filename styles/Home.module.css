@@ -17,6 +17,8 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  padding-top: 40px; /* Slightly increased padding */
 }
 
 .title {
@@ -32,4 +34,43 @@
   background: linear-gradient(90deg, #00b4db, #0083b0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.topSpacer {
+  height: 20px;
+  width: 100%;
+}
+
+.actionButtons {
+  position: absolute;
+  top: 110px; /* Increased from 90px to 110px */
+  right: 30px; /* Increased from 20px to 30px for better alignment */
+  z-index: 10;
+}
+
+.deleteVectorsBtn {
+  background-color: #6d28d9;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.deleteVectorsBtn:hover {
+  background-color: #5b21b6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.pageLoading {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.pageLoaded {
+  animation: zoomIn 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 } 
