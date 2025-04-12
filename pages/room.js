@@ -1,19 +1,24 @@
 import { Canvas } from '@react-three/fiber'
 import ModelLoader from '../components/ModelLoader'
-import GalaxyBackground from '../components/GalaxyBackground'
-import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls, Environment, PerspectiveCamera, Sky, Cloud } from '@react-three/drei'
 import { Suspense } from 'react'
 
 export default function RoomScene() {
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#000' }}>
+    <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas>
         <PerspectiveCamera makeDefault position={[15, 15, 15]} fov={50} far={1000} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 3, 3]} intensity={1} />
         <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
         
-        <GalaxyBackground />
+        {/* Sky with clouds */}
+        <Sky sunPosition={[0, 1, 0]} turbidity={10} rayleigh={0.5} mieCoefficient={0.005} mieDirectionalG={0.8} />
+        <group position={[0, 50, 0]}>
+          <Cloud position={[-4, 2, 0]} speed={0.2} opacity={0.5} />
+          <Cloud position={[4, -2, 0]} speed={0.2} opacity={0.5} />
+          <Cloud position={[0, 0, 0]} speed={0.2} opacity={0.5} />
+        </group>
         
         <Suspense fallback={null}>
           <group position={[0, 10, 0]} rotation={[0, Math.PI * 0.65, 0]}>  {/* Rotated 135 degrees to match desired view */}
