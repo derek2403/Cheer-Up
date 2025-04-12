@@ -37,26 +37,20 @@ export default function RoomScene() {
           {/* Back wall */}
           <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
             <boxGeometry args={[10, 4, 0.2]} />
-            <meshStandardMaterial color="#6D5B8C" />
+            <meshStandardMaterial color="#ADD8E6" />
           </mesh>
           {/* Right wall */}
           <mesh position={[5, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
             <boxGeometry args={[10, 4, 0.2]} />
-            <meshStandardMaterial color="#6D5B8C" />
+            <meshStandardMaterial color="#ADD8E6" />
           </mesh>
           
           {/* Floor */}
           <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <boxGeometry args={[10, 10, 0.2]} />
-            <meshStandardMaterial color="#6D5B8C" />
+            <meshStandardMaterial color="#FFFFFF" />
           </mesh>
-          <ModelLoader
-            modelPath="/models/floor_tiles.obj"
-            mtlPath="/models/floor_tiles.mtl"
-            position={[0, -2.4, 0]}
-            rotation={[0, 0, 0]}
-            scale={1}
-          />
+          
           
           {/* TV Stand */}
           <ModelLoader
