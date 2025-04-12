@@ -5,7 +5,7 @@ import { Suspense, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
 import { useRouter } from 'next/router'
 import Cloud from '../components/cloud'
-import Header from '../components/Header'
+import Header from '../components/header'
 // import GalaxyBackground from '../components/GalaxyBackground'
 
 // Either import your CSS module
@@ -225,9 +225,18 @@ function Character({ position = [0, 0, 0] }) {
   )
 }
 
-// TV component with click handling
+// TV component with click handling and dinosaur image
 function TVModel({ position, rotation, scale }) {
   const router = useRouter()
+  const [tvTexture, setTvTexture] = useState(null)
+  
+  useEffect(() => {
+    // Load the dinosaur texture for the TV screen
+    const textureLoader = new THREE.TextureLoader()
+    textureLoader.load('/dinosaur.png', (texture) => {
+      setTvTexture(texture)
+    })
+  }, [])
   
   const handleClick = () => {
     router.push('/chatbot')
@@ -242,6 +251,14 @@ function TVModel({ position, rotation, scale }) {
         rotation={[0, 0, 0]}
         scale={1}
       />
+      
+      {/* TV Screen with dinosaur image - rotated to face right, moved up and lengthened */}
+      {tvTexture && (
+        <mesh position={[0.1, 0.8, 0.01]} rotation={[0, Math.PI / 2, 0]}>
+          <planeGeometry args={[1.3, 0.8]} />
+          <meshBasicMaterial map={tvTexture} transparent={true} />
+        </mesh>
+      )}
     </group>
   )
 }
