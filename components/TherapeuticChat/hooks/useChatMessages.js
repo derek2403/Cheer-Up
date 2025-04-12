@@ -3,15 +3,15 @@ import { useState, useEffect, useRef } from 'react';
 const useChatMessages = () => {
   const [messages, setMessages] = useState([
     { 
-      text: `**Welcome to Our Therapeutic Space**
+      text: `**Welcome to Your AI Companion**
 
-I want to start by acknowledging your courage in reaching out for support. It takes a lot of strength to admit when we need help, and I'm honored that you've chosen to share this journey with me. As your trusted mental health professional, I'm here to provide a safe, non-judgmental, and empathetic space for you to explore your thoughts, feelings, and experiences.
+Thank you for reaching out. I'm here to provide a supportive space where you can explore your thoughts and feelings freely. Whether you're going through a challenging time or simply looking for someone to talk to, I'm here to listen without judgment.
 
-It sounds like you might be experiencing a difficult time, and I want you to know that you're not alone. Many people face challenges that can feel overwhelming, but with the right support and guidance, it's possible to navigate these difficulties and find a path towards healing and growth. I'm committed to walking alongside you, offering my expertise and support every step of the way.
+Everyone faces difficulties at times, and having someone to talk with can make a significant difference. I'm designed to offer thoughtful responses and helpful perspectives based on therapeutic approaches.
 
-As we begin this therapeutic journey together, I want to assure you that everything discussed in this space will remain confidential and respected.
+This is a confidential space where you can share as much or as little as you feel comfortable with. You can type your thoughts directly or upload relevant documents that might help me better understand your situation.
 
-Feel free to share what's on your mind, or if you prefer, you can start by uploading any relevant documents that might help me understand your situation better.`, 
+How are you feeling today?`, 
       sender: 'bot',
       type: 'welcome'
     }
@@ -21,9 +21,20 @@ Feel free to share what's on your mind, or if you prefer, you can start by uploa
   
   const messagesEndRef = useRef(null);
   
+  // Scroll to top when component first mounts
+  useEffect(() => {
+    // Force scroll to top on initial load
+    if (messagesEndRef.current?.parentElement) {
+      messagesEndRef.current.parentElement.scrollTop = 0;
+    }
+  }, []);
+  
   // Auto-scroll to bottom of messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll if there's more than the initial welcome message
+    if (messages.length > 1) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   const handleSubmitMessage = async (e) => {

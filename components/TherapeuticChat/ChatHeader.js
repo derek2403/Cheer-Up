@@ -4,7 +4,7 @@ const ChatHeader = ({ toggleContextModal }) => {
   return (
     <div className={styles.chatHeader}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <h2>Your Therapeutic Space</h2>
+        <h2>AI Companion</h2>
         <button 
           onClick={toggleContextModal}
           title="Manage Context"
