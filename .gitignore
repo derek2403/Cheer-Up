@@ -42,12 +42,18 @@ next-env.d.ts
 
 /smartcontract/node_modules
 
+# data directories
 /data
 /ai-prompts
 
 # data directories
 /data
 /ai-prompts
+
+# qdrant storage
+/qdrant_storage
+qdrant_storage/
+
 
 # qdrant storage
 /qdrant_storage
