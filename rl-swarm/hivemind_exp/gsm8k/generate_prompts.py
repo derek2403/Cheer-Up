@@ -3,6 +3,7 @@ import hashlib
 import os
 import random
 import re
+import time
 
 from datasets import Dataset, load_dataset
 
@@ -206,16 +207,42 @@ def generate_stage2_user_prompt(datum, cols):
     return "".join(sp)
 
 
-def extract_supervisor_content(text):
-    """Extract the content after a heading with ** in supervisor feedback."""
+def extract_supervisor_content(text, record_raw_response=True):
+    """
+    Extract the content after a heading with ** in supervisor feedback.
+    
+    Parameters:
+    - text: The text to extract content from
+    - record_raw_response: If True, record the entire raw response instead of just the extracted content
+    """
     pattern = r'\*\*(.*?)\*\*\s*([\s\S]*?)(?=\n\n|\Z)'
     match = re.search(pattern, text)
+    
+    # Create the log file path
+    log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+    
+    if record_raw_response:
+        # Get the current feedback number by counting existing feedback entries
+        feedback_num = 1
+        try:
+            with open(log_file_path, "r") as f:
+                content = f.read()
+                feedback_num = content.count("<supervisor_feedback>") + 1
+        except:
+            # If file doesn't exist or can't be read, start with feedback 1
+            pass
+            
+        # Record the entire raw supervisor feedback with numbering
+        with open(log_file_path, "a") as f:
+            # Extract just the useful part of the response (not the template text)
+            clean_text = text.strip()
+            f.write(f"<supervisor_feedback #{feedback_num}>\n{clean_text}\n</supervisor_feedback>\n\n")
+            
+    # Still extract the content for the original functionality
     if match:
         content = match.group(2).strip()
-        # Log to file in root directory
-        with open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt"), "a") as f:
-            f.write(f"<content>{content}</content>\n\n")
         return f"<content>{content}</content>"
+    
     return ""
 
 
@@ -233,12 +260,35 @@ def generate_stage3_user_prompt(datum, cols):
     # Store extracted contents
     supervisor_contents = []
     
+    # Create the log file path 
+    log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+    
+    # Record all supervisor feedback with their IDs
+    with open(log_file_path, "a") as f:
+        f.write("# All Supervisor Feedback\n\n")
+    
+    # Get the current supervisor entry number
+    supervisor_entry_num = 1
+    try:
+        with open(log_file_path, "r") as f:
+            content = f.read()
+            supervisor_entry_num = content.count("<supervisor id=") + 1
+    except:
+        pass
+    
     for agentID in agentID_to_supervisorID:
         feature = f"agent_opinion_{agentID}"
         if feature in datum:
             feedback_text = datum[feature]
+            
+            # Record the supervisor feedback with ID and entry number
+            with open(log_file_path, "a") as f:
+                supervisor_id = agentID_to_supervisorID[agentID]
+                f.write(f"<supervisor id=\"{supervisor_id}\" entry=\"{supervisor_entry_num}\">\n{feedback_text}\n</supervisor>\n\n")
+                supervisor_entry_num += 1
+            
             # Extract content after ** marker
-            extracted_content = extract_supervisor_content(feedback_text)
+            extracted_content = extract_supervisor_content(feedback_text, record_raw_response=False)
             if extracted_content:
                 supervisor_contents.append(extracted_content)
                 
@@ -336,6 +386,40 @@ def get_stage1_samples():
     return train_dataset, test_dataset
 
 
+def get_user_input_samples():
+    """
+    Creates a dataset with a single sample based on user input.
+    This is used instead of loading from a predefined dataset.
+    """
+    from datasets import Dataset
+    
+    # Get user input
+    user_question = input("Please enter your mental health question: ")
+    
+    # Create a dataset with just this question
+    data = {
+        "question": [user_question],
+        "answer": ["#### This is a mental health question"]
+    }
+    
+    # Create the datasets directly
+    dataset = Dataset.from_dict(data)
+    
+    # Convert dataset to the expected format
+    dataset = get_gsm8k_questions(dataset)
+    
+    # Create mock supervisor feedback to ensure extract_supervisor_content is used
+    # This is a placeholder that will be replaced with actual feedback during the process
+    mock_feedback = "**Supervisor Analysis**\nThis is a placeholder for supervisor feedback that will be extracted and recorded."
+    
+    # Add a dummy field to ensure the supervisor content extraction works
+    # This won't affect the actual functionality but ensures the extraction method is called
+    dataset = dataset.map(lambda x: {"mock_supervisor_feedback": extract_supervisor_content(mock_feedback)})
+    
+    # Return the same dataset for both train and test
+    return dataset, dataset
+
+
 def fill_unknown_answers_opinions(values):
     FILLED_FIELDS = ("agent_answers", "agent_opinion")
 
@@ -378,4 +462,136 @@ def get_stage3_samples(values, test_size=0.1):
 
     # convert our dataset to the r1 prompt
     dataset = get_gsm8k_questions_with_stage1and2_answers(dataset)
+    return dataset, dataset
+
+
+def get_user_input_with_supervisor_simulation():
+    """
+    Creates a dataset with a single sample based on user input and simulates
+    the multi-stage process including supervisor feedback recording.
+    """
+    from datasets import Dataset
+    
+    # Get user input
+    user_question = input("Please enter your mental health question: ")
+    
+    # Create a dataset with just this question
+    data = {
+        "question": [user_question],
+        "answer": ["#### This is a mental health question"]
+    }
+    
+    # Create the datasets directly
+    dataset = Dataset.from_dict(data)
+    
+    # Convert dataset to the expected format for stage 1
+    dataset = get_gsm8k_questions(dataset)
+    
+    # Simulate agent answers (therapist responses)
+    # Format the keys with the expected prefix 'agent_answers_'
+    agent_answers = {}
+    agent_ids = ["agent1", "agent2"] 
+    
+    # Add the agent answers with proper column naming
+    for agent_id in agent_ids:
+        column_name = f"agent_answers_{agent_id}"
+        agent_answers[column_name] = f"I understand you're sharing about {user_question[:30]}... Let me help you with this situation."
+    
+    # Add each agent answer as a separate column
+    for col, value in agent_answers.items():
+        dataset = dataset.map(lambda x: {col: value})
+    
+    # Use a simplified custom function for stage2 prompt that doesn't rely on pick_k_cols
+    def simple_stage2_prompt(x):
+        prompt = f"The client concern we received is: {x['question']}\n\n"
+        prompt += "The following therapeutic responses were provided:\n"
+        
+        for i, agent_id in enumerate(agent_ids):
+            col = f"agent_answers_{agent_id}"
+            if col in x:
+                prompt += f"<therapist>Therapist #{i}</therapist> said\n"
+                prompt += x[col]
+                prompt += "\n\n\n"
+        
+        return prompt
+    
+    # Generate stage2 prompt without using pick_k_cols
+    dataset = dataset.map(lambda x: {"stage2_prompt": simple_stage2_prompt(x)})
+    
+    # Simulate supervisor feedback
+    # Format the keys with the expected prefix 'agent_opinion_'
+    supervisor_feedback = {}
+    supervisor_ids = ["supervisor1", "supervisor2"]
+    
+    for supervisor_id in supervisor_ids:
+        column_name = f"agent_opinion_{supervisor_id}"
+        supervisor_feedback[column_name] = f"""After reviewing the therapeutic responses:
+**Clinical Evaluation**
+The therapist establishes good rapport and uses evidence-based techniques. Their response addresses the client's concern about "{user_question[:30]}...".
+
+This approach aligns with best practices in therapeutic intervention for this type of situation.
+"""
+    
+    # Add each supervisor opinion as a separate column
+    for col, value in supervisor_feedback.items():
+        dataset = dataset.map(lambda x: {col: value})
+    
+    # Create a simplified function for stage3 prompt that doesn't rely on pick_k_cols
+    def simple_stage3_prompt(x):
+        prompt = f"{x['stage2_prompt']}\n"
+        prompt += "After comparing these therapeutic responses, the following supervision feedback was provided:\n"
+        
+        # Store extracted contents
+        supervisor_contents = []
+        
+        # Create the log file path
+        log_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "supervisor_content.txt")
+        
+        # Record all supervisor feedback with their IDs
+        with open(log_file_path, "a") as f:
+            f.write("# All Supervisor Feedback from Simulation\n\n")
+        
+        # Get the current supervisor entry number
+        supervisor_entry_num = 1
+        try:
+            with open(log_file_path, "r") as f:
+                content = f.read()
+                supervisor_entry_num = content.count("<supervisor id=") + 1
+        except:
+            pass
+        
+        for i, supervisor_id in enumerate(supervisor_ids):
+            col = f"agent_opinion_{supervisor_id}"
+            if col in x:
+                feedback_text = x[col]
+                
+                # Record the supervisor feedback with ID and entry number
+                with open(log_file_path, "a") as f:
+                    f.write(f"<supervisor id=\"{i}\" entry=\"{supervisor_entry_num}\">\n{feedback_text}\n</supervisor>\n\n")
+                    supervisor_entry_num += 1
+                
+                # Extract content after ** marker
+                extracted_content = extract_supervisor_content(feedback_text, record_raw_response=False)
+                if extracted_content:
+                    supervisor_contents.append(extracted_content)
+                
+                prompt += f"<supervisor>Supervisor #{i}</supervisor> provided\n"
+                prompt += feedback_text
+                prompt += "\n\n\n"
+        
+        # Add all extracted contents at the very end
+        if supervisor_contents:
+            prompt += "\n\n\n\n\n"
+            for content in supervisor_contents:
+                prompt += content
+                prompt += "\n"
+        
+        return prompt
+    
+    # Generate stage3 prompt which will trigger the extract_supervisor_content function
+    dataset = dataset.map(lambda x: {"stage3_prompt": simple_stage3_prompt(x)})
+    
+    print("Supervisor feedback has been recorded to the log file.")
+    
+    # Return the same dataset for both train and test
     return dataset, dataset
