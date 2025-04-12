@@ -12,11 +12,13 @@ const SubscriptionPopup = ({ onClose, onSubscribe, isSubscribed, subscriptionPri
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold mb-4">Subscription Required</h2>
+        <h2 className="text-xl font-bold mb-4">{isSubscribed ? 'Extend Subscription' : 'Subscription Required'}</h2>
         
         {isSubscribed ? (
           <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
-            <p className="text-green-700 font-medium">✅ You already have an active subscription!</p>
+            <p className="text-green-700 font-medium">✅ You have an active subscription</p>
+            <p className="text-green-600 mt-1">Extend your subscription by another month.</p>
+            <p className="font-medium mt-2">Price: {subscriptionPrice} NEAR / month</p>
           </div>
         ) : (
           <div className="mb-4">
@@ -39,15 +41,13 @@ const SubscriptionPopup = ({ onClose, onSubscribe, isSubscribed, subscriptionPri
             Close
           </button>
           
-          {!isSubscribed && (
-            <button 
-              onClick={onSubscribe}
-              disabled={loading}
-              className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {loading ? 'Processing...' : 'Subscribe Now'}
-            </button>
-          )}
+          <button 
+            onClick={onSubscribe}
+            disabled={loading}
+            className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            {loading ? 'Processing...' : isSubscribed ? 'Extend Subscription' : 'Subscribe Now'}
+          </button>
         </div>
       </div>
     </div>
@@ -114,7 +114,10 @@ export const ConnectWallet = () => {
       <div className="flex justify-between items-center space-x-8">
         {/* Subscription status */}
         {isLoggedIn && isSubscribed && (
-          <div className="text-sm mr-4">
+          <div 
+            className="text-sm mr-4 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setShowSubscriptionPopup(true)}
+          >
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
               <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
                 <circle cx="4" cy="4" r="3" />
@@ -123,7 +126,7 @@ export const ConnectWallet = () => {
             </span>
             {subscriptionExpiry !== 'N/A' && (
               <p className="mt-1.5 text-xs text-gray-600">
-                Expires: {subscriptionExpiry}
+                Expires: {subscriptionExpiry} <span className="ml-1 text-blue-500">(Click to extend)</span>
               </p>
             )}
           </div>
