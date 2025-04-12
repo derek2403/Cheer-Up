@@ -43,22 +43,28 @@ export default function ChatbotPage() {
       </main>
 
       <style jsx global>{`
-        /* Reset default browser margins/padding */
         html,
         body {
           margin: 0;
           padding: 0;
-          box-sizing: border-box; /* Include padding and border in element's total width and height */
+          box-sizing: border-box;
+          height: 100vh;
+          overflow: hidden;
         }
 
-        /* Ensure the container's background behavior */
-        html {
-          height: 100%; /* Ensure html takes full height */
+        /* Set up proper viewport sizing */
+        .${styles.container} {
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
         }
         
-        body {
-          min-height: 100%; /* Ensure body takes at least full height */
-          scroll-padding-top: 80px; /* Existing style */
+        .${styles.main} {
+          flex: 1;
+          margin-top: 80px;
+          height: calc(100vh - 80px); /* Subtract header height */
+          overflow: hidden;
+          position: relative;
         }
         
         @keyframes zoomIn {
@@ -79,10 +85,6 @@ export default function ChatbotPage() {
         
         .${styles.pageLoaded} {
           animation: zoomIn 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-        }
-
-        .${styles.main} {
-          margin-top: 80px; /* Add spacing below header */
         }
       `}</style>
     </div>
