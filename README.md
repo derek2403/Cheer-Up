@@ -273,15 +273,15 @@ Instead of deploying separate personalized models for each user, the plan is to 
 ## Team👥
 
 - **Derek Liew Qi Jian**  
-  - *Role*: Project Lead, AI & 
+  - *Role*: Project Lead, AI & TEE Integration
   - [LinkedIn](https://www.linkedin.com/in/derek2403/) | [Twitter](https://x.com/derek2403)
 
 - **Phen Jing Yuan**  
-  - *Role*: TEE & Frontend Integration  
+  - *Role*: Near Smart Contract Developer & The Swarm Coder
   - [LinkedIn](https://www.linkedin.com/in/jing-yuan-phen-b42266295/) | [Twitter](https://x.com/ilovedahmo)
 
- - **Marcus Tan Chi Yau**  
-  - *Role*: Frontend Developer & UI/UX Design  
+- **Marcus Tan Chi Yau**  
+  - *Role*: Frontend Developer & UI/UX Design & Upstage Coder
   - [LinkedIn](https://www.linkedin.com/in/marcus-tan-8846ba271/)
 
 - **Tan Zhi Wei**  
