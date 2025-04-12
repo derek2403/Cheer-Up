@@ -17,6 +17,8 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  padding-top: 40px; /* Slightly increased padding */
 }
 
 .title {
@@ -40,11 +42,10 @@
 }
 
 .actionButtons {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  max-width: 850px;
-  margin: 0 0 15px 0;
+  position: absolute;
+  top: 110px; /* Increased from 90px to 110px */
+  right: 30px; /* Increased from 20px to 30px for better alignment */
+  z-index: 10;
 }
 
 .deleteVectorsBtn {
@@ -52,14 +53,17 @@
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .deleteVectorsBtn:hover {
   background-color: #5b21b6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .pageLoading {

@@ -44,7 +44,7 @@ export default function ChatbotPage() {
         return;
       }
 
-      // For successful deletion, just succeed silently
+      // For successful deletion, show success message
       if (response.ok) {
         setModalMessage("Vectors successfully deleted!");
         setShowModal(true);
@@ -87,9 +87,6 @@ export default function ChatbotPage() {
       <Header />
       
       <main className={`${styles.main} ${isLoading ? styles.pageLoading : styles.pageLoaded}`}>
-        {/* Add a spacer element at the top */}
-        <div className={styles.topSpacer}></div>
-        
         <div className={styles.actionButtons}>
           <button 
             onClick={handleClearVectors}
@@ -108,7 +105,7 @@ export default function ChatbotPage() {
         }
         
         body {
-          scroll-padding-top: 80px; /* Adjust based on your header height */
+          scroll-padding-top: 80px;
         }
         
         @keyframes zoomIn {
@@ -177,31 +174,6 @@ export default function ChatbotPage() {
 
         .modal-button:hover {
           background-color: #4338ca;
-        }
-      `}</style>
-
-      <style jsx>{`
-        .${styles.actionButtons} {
-          display: flex;
-          justify-content: flex-end;
-          width: 100%;
-          max-width: 850px;
-          margin: 0 0 15px auto;
-        }
-
-        .${styles.deleteVectorsBtn} {
-          background-color: #6d28d9;
-          color: white;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: background-color 0.2s;
-        }
-
-        .${styles.deleteVectorsBtn}:hover {
-          background-color: #5b21b6;
         }
       `}</style>
     </div>
