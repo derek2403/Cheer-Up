@@ -3,6 +3,7 @@ import ModelLoader from '../components/ModelLoader'
 import { OrbitControls, Environment, PerspectiveCamera, useGLTF, Sky, useTexture } from '@react-three/drei'
 import { Suspense, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
+import { MOUSE } from 'three'
 import { useRouter } from 'next/router'
 import Cloud from '../components/cloud'
 // import GalaxyBackground from '../components/GalaxyBackground'
@@ -269,6 +270,11 @@ export default function RoomScene() {
           enableZoom={true}
           enableRotate={true}
           minDistance={2}
+          mouseButtons={{
+            LEFT: THREE.MOUSE.LEFT,
+            MIDDLE: THREE.MOUSE.RIGHT,
+            RIGHT: THREE.MOUSE.NONE
+          }}
         />
       </Canvas>
     </div>
