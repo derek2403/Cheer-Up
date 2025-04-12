@@ -309,7 +309,7 @@ function DebugHelper({ floorMesh }) {
 // import styles from '../styles/Room.module.css'
 
 // GLBModel component with character movement
-function GLBModel({ url, position, rotation, scale, materialColor }) {
+function GLBModel({ url, position, rotation, scale, materialColor, texture }) {
   const { scene } = useGLTF(url)
   const router = useRouter()
   const [isMoving, setIsMoving] = useState(false)
@@ -346,11 +346,19 @@ function GLBModel({ url, position, rotation, scale, materialColor }) {
       scale={scale}
       onClick={moveToRack}
     >
-      <meshStandardMaterial 
-        color={materialColor}
-        metalness={0.5}
-        roughness={0.5}
-      />
+      {texture ? (
+        <meshStandardMaterial 
+          map={texture}
+          metalness={0.3}
+          roughness={0.7}
+        />
+      ) : (
+        <meshStandardMaterial 
+          color={materialColor}
+          metalness={0.5}
+          roughness={0.5}
+        />
+      )}
     </primitive>
   )
 }
@@ -394,6 +402,7 @@ function WalkableAreaHelper() {
 function TVModel({ position, rotation, scale }) {
   const router = useRouter()
   const [isMoving, setIsMoving] = useState(false)
+  const dinoTexture = useTexture('/dinosaur.png')
   
   const moveToTV = () => {
     if (!isMoving) {
@@ -428,6 +437,12 @@ function TVModel({ position, rotation, scale }) {
         rotation={[0, 0, 0]}
         scale={1}
       />
+      
+      {/* TV Screen with dinosaur image - rotated to face right, moved up and lengthened */}
+      <mesh position={[0.1, 0.8, 0.01]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[1.3, 0.8]} />
+        <meshBasicMaterial map={dinoTexture} transparent={true} />
+      </mesh>
     </group>
   )
 }
@@ -509,6 +524,29 @@ function WoodFloor() {
         side={THREE.DoubleSide}
       />
     </mesh>
+  )
+}
+
+// PictureFrame component
+function PictureFrame({ position, rotation, scale }) {
+  const dinoTexture = useTexture('/dinosaur.png')
+  
+  return (
+    <group position={position} rotation={rotation} scale={scale}>
+      <GLBModel
+        url="/models/picture_frame.glb"
+        position={[0, 0, 0]}
+        rotation={[0, 0, 0]}
+        scale={1}
+        materialColor="#2D1B3C"
+      />
+      
+      {/* Dinosaur image inside the frame - adjusted position and size */}
+      <mesh position={[0, 0.72, 0.13]} rotation={[0, 0, 0]}>
+        <planeGeometry args={[0.9, 1.0]} />
+        <meshBasicMaterial map={dinoTexture} transparent={true} />
+      </mesh>
+    </group>
   )
 }
 
@@ -700,12 +738,10 @@ export default function RoomScene() {
               />
               
 
-              <GLBModel
-                url="/models/picture_frame.glb"
+              <PictureFrame
                 position={[4.8, 0, -3.5]}
                 rotation={[0, -Math.PI / 2, 0]}
                 scale={1}
-                materialColor="#2D1B3C"
               />
 
               {/* Rack */}
