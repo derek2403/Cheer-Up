@@ -32,7 +32,8 @@
     "react-dom": "^19.0.0",
     "viem": "^2.26.3",
     "wagmi": "^2.14.16",
-    "react-dropzone": "^14.3.8"
+    "react-dropzone": "^14.3.8",
+    "three": "^0.175.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

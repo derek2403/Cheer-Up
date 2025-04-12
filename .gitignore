@@ -45,3 +45,10 @@ next-env.d.ts
 /data
 /ai-prompts
 
+# data directories
+/data
+/ai-prompts
+
+# qdrant storage
+/qdrant_storage
+qdrant_storage/

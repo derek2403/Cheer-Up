@@ -1,6 +1,6 @@
 # Therapeutic Assistant - RAG-Powered Mental Health Support
 
-A Next.js application that provides compassionate, evidence-based mental health support through a therapeutic conversation interface. This project combines advanced document parsing, RAG (Retrieval-Augmented Generation) capabilities, and psychological expertise to create a supportive therapeutic experience.
+A Next.js application that provides compassionate, evidence-based mental health support through a therapeutic conversation interface. This project combines advanced document parsing, RAG (Retrieval-Augmented Generation) capabilities, and psychological expertise to create a supportive therapeutic experience. It leverages Meta's Llama 3.3 70B Instruct model through the RedPill API for high-quality, multilingual therapeutic responses.
 
 ## Features
 
@@ -8,7 +8,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
 - Upload and parse therapeutic content (PDF, PNG, JPG)
 - Support for psychological research papers, therapeutic techniques, clinical guidelines
 - Automatic embedding generation using Upstage API
-- Vector storage in Pinecone for semantic search
+- Vector storage for semantic search using Qdrant
 - Dark theme UI for better readability
 
 ### Therapeutic Conversation
@@ -37,6 +37,8 @@ A Next.js application that provides compassionate, evidence-based mental health 
 │   │   └── delete-vectors.js # Vector cleanup
 │   ├── document-chat.js    # Therapeutic conversation interface
 │   └── index.js           # Landing page
+├── utils/
+│   └── qdrantClient.js    # Vector database client
 ├── .env.example           # Environment template
 └── .env.local            # Local environment vars
 ```
@@ -54,7 +56,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
    - Parsed HTML is split into meaningful chunks
    - Special handling for different content types (therapeutic techniques, research findings, etc.)
    - Each chunk is embedded using Upstage Embedding API
-   - Embeddings are stored in Pinecone with metadata
+   - Embeddings are stored in the vector database with metadata
 
 ### Therapeutic Conversation Pipeline
 
@@ -90,17 +92,14 @@ A Next.js application that provides compassionate, evidence-based mental health 
 3. Create a `.env.local` file:
    ```
    UPSTAGE_API_KEY=your_upstage_api_key
-   PINECONE_API_KEY=your_pinecone_api_key
-   PINECONE_INDEX_NAME=your_index_name
    OPENAI_API_KEY=your_openai_api_key
+   REDPILL_API_KEY=your_redpill_api_key
    ```
 
-4. Create a Pinecone index:
-   - Sign up for Pinecone
-   - Create index with:
-     - Dimension: 4096 (matches Upstage embedding model)
-     - Metric: Cosine
-     - Type: Dense
+4. Set up Qdrant (locally or cloud):
+   - Install Qdrant locally or use Qdrant Cloud
+   - Configure connection in `utils/qdrantClient.js`
+   - Collection will be initialized automatically
 
 5. Run the development server:
    ```bash
@@ -134,12 +133,20 @@ A Next.js application that provides compassionate, evidence-based mental health 
    - Model: embedding-passage
    - Dimension: 4096
 
-3. **OpenAI API**
+3. **RedPill API with Llama 3.3**
+   - Model: phala/llama-3.3-70b-instruct
+   - Base URL: https://api.redpill.ai/v1
+   - Temperature: 0.4 (balanced for empathy and accuracy)
+   - Context window: 12K tokens
+   - Multilingual support: English, German, French, Italian, Portuguese, Hindi, Spanish, and Thai
+   - Optimized for therapeutic conversation
+
+4. **OpenAI API** (alternative option)
    - Model: gpt-4o-mini
    - Temperature: 0.4 (balanced for empathy and accuracy)
    - Optimized for therapeutic conversation
 
-4. **Pinecone Vector Database**
+5. **Qdrant Vector Database**
    - Dense vector storage
    - Dimension: 4096
    - Distance: Cosine similarity
@@ -170,6 +177,8 @@ A Next.js application that provides compassionate, evidence-based mental health 
 - User-friendly modal feedback
 - Graceful fallbacks with therapeutic tone
 - Silent success for technical operations
+- Robust LLM response handling for null content prevention
+- Response structure validation and safeguards
 
 ## Security and Ethics
 
