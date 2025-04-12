@@ -149,19 +149,53 @@ Users can further personalize their experience by optionally uploading personal 
 ---
 
 ## Tech Stack Overview🛠️
+- **Next.js 15** – Front-end framework powering the user interface and seamless client-side interactions.
+- **Three.js** – Library for creating immersive, interactive visual experiences.
+- **Tailwind CSS** – Utility-first CSS framework for rapid and responsive UI styling.
+- **Hero UI (formerly NextUI)** – Ready-made, customizable UI component library.
+- **NEAR Blockchain** – Platform for smart contract subscriptions and secure wallet integration.
+- **Phala Network** – TEE hosting and on-chain attestation proofs to ensure maximum data security.
+- **Docker** – Containerization solution for securely hosting and deploying code within Phala TEEs.
+- **Ethers.js** – JavaScript library to facilitate blockchain interactions and smart contract integration.
+- **Gensyn Swarm** – Distributed reinforcement learning network where multiple LLMs collaborate to refine mental health guidance based on collective, anonymized user feedback.
+- **Red Pill** – A fine-tuned Deepseek model deployed in a TEE, hosted via Phala Network.
+- **Upstage API** – Retrieval-Augmented Generation (RAG) API for parsing and extracting meaningful information from user-uploaded documents.
 
 
 ---
 
-## Important Code Directories📂 
+## Important Code Directories 📂
 
+Here's a quick reference to the major directories and files in this project, along with their purposes:
 
+- **`components/`**  
+  Contains reusable UI elements and other modular building blocks for the front end.
 
+- **`hooks/`**  
+  Houses various custom React Hooks, including functions that interact with the NEAR smart contracts and perform other utility tasks.
 
+- **`nearAgent/`**  
+  Contains the logic and configuration for hosting the LLM in the NEAR AI Agent Hub (non-TEE version).  
+  > **Note:** To run everything inside a TEE, you’d integrate it with Phala Network’s secure enclave environment or use our platform
 
+- **`pages/`**  
+  All Next.js pages (routes) and their respective components live here, defining the user-facing interface and navigation.
 
+- **`rl-swarm/`**  
+  Holds the code for the Gensyn Swarm implementation, where reinforcement learning logic is managed and models can collaboratively refine mental health guidance.
+
+- **`scripts/`**  
+  Contains scripts for interacting with external services, including Upstage APIs for document parsing and information extraction in the RAG pipeline.
+
+- **`smartcontract/`**  
+  NEAR smart contract source code for handling subscription payments (1 NEAR/month) and other on-chain functionalities.
+
+- **`Dockerfile` & `docker-compose.yml`**  
+  Configuration for containerizing the application to run securely in a Phala TEE or other Docker-compatible environments. This ensures portability and consistency across different hosting setups.
 
 ---
+
+
 
 
 ## Future Implementations 🚀
@@ -183,4 +217,12 @@ Users can further personalize their experience by optionally uploading personal 
 - **Phen Jing Yuan**  
   - *Role*: TEE & Frontend Integration  
   - [LinkedIn](https://www.linkedin.com/in/jing-yuan-phen-b42266295/) | [Twitter](https://x.com/ilovedahmo)
+
+ - **Marcus Tan Chi Yau**  
+  - *Role*: Frontend Developer & UI/UX Design  
+  - [LinkedIn](https://www.linkedin.com/in/marcus-tan-8846ba271/)
+
+- **Tan Zhi Wei**  
+  - *Role*: Frontend Developer & UI/UX Design  
+  - [LinkedIn](https://www.linkedin.com/in/tanzhiwei0328/)
 
