@@ -41,7 +41,7 @@ export function DocumentParserComponent() {
     setError('');
     
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('document', file);
 
     try {
       // First parse the document
@@ -64,7 +64,7 @@ export function DocumentParserComponent() {
         },
         body: JSON.stringify({
           documentId: file.name,
-          htmlContent: parseData.htmlOutput
+          htmlContent: parseData.content.html
         }),
       });
 
@@ -72,10 +72,12 @@ export function DocumentParserComponent() {
         throw new Error('Failed to process document');
       }
 
+      const ingestData = await ingestResponse.json();
+
       setSections({
-        htmlOutput: parseData.htmlOutput,
-        rawHtml: parseData.rawHtml,
-        textOutput: parseData.textOutput
+        htmlOutput: parseData.content.html,
+        rawHtml: parseData.content.html,
+        textOutput: parseData.content.text
       });
       
       setUploadSuccess(true);
