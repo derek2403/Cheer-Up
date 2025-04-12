@@ -7,7 +7,7 @@ export default function RoomScene() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 2, 5]} fov={60} />
+        <PerspectiveCamera makeDefault position={[8, 5, 8]} fov={75} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[3, 3, 3]} intensity={1} />
         <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
@@ -21,7 +21,7 @@ export default function RoomScene() {
         </group>
         
         <Suspense fallback={null}>
-          <group position={[0, 10, 0]} rotation={[0, Math.PI * 0.65, 0]}>  {/* Rotated 135 degrees to match desired view */}
+          <group position={[0, 0, 0]} rotation={[0, Math.PI * 0.65, 0]}>  {/* Adjusted position from [0, 10, 0] to [0, 0, 0] */}
             {/* Back wall */}
             <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
               <boxGeometry args={[10, 4, 0.2]} />
