@@ -67,7 +67,7 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
    - Embedding is used to search Pinecone for relevant chunks
 
 2. **Context Retrieval**
-   - Top 10 most similar chunks are retrieved
+   - Top 15 most similar chunks are retrieved
    - High-quality matches (similarity > 0.7) are selected
    - Chunks are organized by type and combined
 
