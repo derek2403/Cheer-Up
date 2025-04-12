@@ -727,4 +727,107 @@
   40% { 
     transform: scale(1.0);
   }
+}
+
+/* Modal Styles - Moved from inline */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0; 
+  bottom: 0; 
+  width: 100vw; 
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Slightly darker */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000; 
+}
+
+.modalContent {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 16px; /* More rounded */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 650px; /* Slightly wider */
+  width: 90%;
+  max-height: 90vh; 
+  overflow-y: auto; 
+  position: relative;
+  /* Add entrance animation */
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #eee;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #555;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.modalCloseButton:hover {
+  background-color: #ddd;
+  color: #333;
+}
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* Manage Context Section within Modal */
+.manageContextContainer {
+  margin-top: 25px; 
+  padding-top: 25px; 
+  border-top: 1px solid #e5e7eb; /* Lighter border */
+}
+
+.manageContextTitle {
+  margin-bottom: 12px; 
+  color: #1f2937; /* Darker gray */
+  font-size: 1.25rem; /* Slightly larger */
+  font-weight: 600;
+}
+
+.clearContextButton {
+  /* Use a class for the button */
+  background-color: #ef4444; /* Tailwind red-500 */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clearContextButton:hover {
+  background-color: #dc2626; /* Tailwind red-600 */
+}
+
+.clearContextDescription {
+  font-size: 0.9rem; 
+  color: #4b5563; /* Tailwind gray-600 */
+  margin-top: 12px; 
 } 
