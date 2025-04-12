@@ -4,11 +4,25 @@
 
 ![Logo](https://github.com/derek2403/Cheer-Up/blob/main/public/logo.png?raw=true)
 
-An AI-driven mental healthcare assistant securely operating within a TEE, leveraging Gensyn’s swarm and Upstage's RAG to adaptively learn about each patient and provide personalized, context-aware guidance—all accessible via NEAR subscription.
+An AI-driven mental healthcare assistant securely operating with privacy and confidentiality within a TEE, leveraging Gensyn’s swarm and Upstage's RAG to adaptively learn about each patient and provide personalized, context-aware guidance—all accessible via NEAR subscription.
 
 ---
 
-## Inspiration: How We Came Up with This Idea💡
+## Inspiration: How We Came Up With This Idea 💡
+
+One of our team members, who is Asian, experienced personal mental health challenges but found that when they finally sought professional help, both family and friends labeled them as "weird." Moreover, he realized that in their culture and in many parts of Asia—there's a strong tendency to disregard the need for strict confidentiality. Often, people end up sharing their struggles openly because trusted, discreet care simply isn’t accessible or valued.
+
+We thought:
+
+> *"What if everyone could access mental health support that stays completely confidential, so they can get help without being judged by family and friends?"*
+
+This exploration led us to design a platform that is not only accessible and adaptive but also offers rock-solid confidentiality. Our research and real-life stories revealed that:
+
+- **Limited Mental Health Infrastructure:** In many Asian countries, a shortage of professionals and inadequate funding mean that reliable mental health care is scarce.
+- **Cultural and Social Barriers:** Deep-rooted cultural stigma—such as the need to "save face" and maintain family honor—often deters individuals from seeking help. Traditional beliefs and a preference for informal support further compound the problem.
+- **Economic and Systemic Challenges:** In regions with underfunded health services and uneven access between urban and rural areas, even those who want help may not be able to receive it in a timely, confidential manner.
+
+Understanding these challenges, we were inspired to create a mental healthcare assistant that preserves the user’s privacy while delivering personalized, effective support tailored to the unique cultural context of many Asian communities.
 
 
 ---
@@ -149,6 +163,26 @@ Users can further personalize their experience by optionally uploading personal 
 
 ---
 
+## Proof of Gamification: Why It Matters 💪
+
+Recent research has provided solid evidence that integrating gamification into mental health apps can significantly improve user engagement, retention, and ultimately mental wellness. For example:
+
+- **Enhanced Engagement & Resilience:**  
+  A large-scale randomized controlled trial of the gamified app *eQuoo* demonstrated that game-inspired elements—such as progress feedback, narrative challenges, and rewards—led to notable improvements in resilience and reduced symptoms of depression and anxiety among students.  
+  [Read the eQuoo study](https://mental.jmir.org/2023/1/e47285)
+
+- **Systematic Review Insights:**  
+  A systematic review on gamification in mental health apps outlines that key gamification elements (e.g., levels, rewards, and personalized feedback) are closely associated with better mental health outcomes and sustained user participation. This research highlights that gamification is not merely for entertainment but serves as a robust mechanism to motivate behavioral change and promote long-term engagement.  
+  [View the systematic review](https://www.researchgate.net/publication/333473768_Gamification_in_Apps_and_Technologies_for_Improving_Mental_Health_and_Well-Being_A_Systematic_Review)
+
+- **User Perspectives on Health Tracking:**  
+  Qualitative analyses of user reviews for depression self-management apps reveal that visual feedback (like timelines or memory snapshots) and gamified tracking features provide users with tangible evidence of their progress. These features help boost self-awareness, making users feel more in control of their mental health journey.  
+  [See insights from user reviews](https://www.researchgate.net/publication/362539161_Health_tracking_via_mobile_apps_for_depression_self-management_a_qualitative_content_analysis_of_user_reviews)
+
+Together, these studies underscore that gamification is not just an add-on but a fundamental aspect in enhancing the effectiveness of digital mental health interventions. It drives both initial engagement and continuous usage, making it a key ingredient for improving mental health outcomes.
+
+---
+
 ## Tech Stack Overview🛠️
 - **Next.js 15** – Front-end framework powering the user interface and seamless client-side interactions.
 - **Three.js** – Library for creating immersive, interactive visual experiences.
@@ -201,10 +235,14 @@ Here's a quick reference to the major directories and files in this project, alo
 
 ## Future Implementations 🚀
 
+### Fully TEE-hosted LLM Deployment
+
+Currently, our AI is provided by Hivemind and operates as a distributed swarm outside of a TEE. Although effective as a proof-of-concept, configuring this setup is time-consuming and complex for this 3 day hackathon. Future iterations will convert this configuration into a unified, TEE-hosted LLM solution thus providing privacy also.
 
 
+### Multi-User Adaptive Swarm
 
-
+Instead of deploying separate personalized models for each user, the plan is to have the swarm cater to multiple users within a single TEE. This integrated approach maintains security and confidentiality while improving overall performance and efficiency through shared, adaptive learning and contextual processing.
 
 ---
 
@@ -226,5 +264,9 @@ Here's a quick reference to the major directories and files in this project, alo
 - **Tan Zhi Wei**  
   - *Role*: Frontend Developer & UI/UX Design  
   - [LinkedIn](https://www.linkedin.com/in/tanzhiwei0328/)
+ 
+- **Leong Ee Mun**  
+  - *Role*: Frontend Developer & UI/UX Design  
+  - [LinkedIn](https://www.linkedin.com/in/ee-mun-leong-700a23316/)
 
 
