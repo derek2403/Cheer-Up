@@ -1,26 +1,24 @@
-# Document Parser and RAG Chatbot Demo
+# Therapeutic Assistant - RAG-Powered Mental Health Support
 
-A Next.js application that demonstrates document parsing and RAG (Retrieval-Augmented Generation) capabilities using Upstage APIs and Pinecone vector database. This project allows users to upload documents, parse them, store their embeddings, and interact with the content through a semantic search-powered chatbot.
+A Next.js application that provides compassionate, evidence-based mental health support through a therapeutic conversation interface. This project combines advanced document parsing, RAG (Retrieval-Augmented Generation) capabilities, and psychological expertise to create a supportive therapeutic experience.
 
 ## Features
 
 ### Document Parser
-- Upload and parse documents (PDF, PNG, JPG)
-- View parsed results in three formats:
-  - Rendered HTML output
-  - Raw HTML with syntax highlighting
-  - Plain text output
+- Upload and parse therapeutic content (PDF, PNG, JPG)
+- Support for psychological research papers, therapeutic techniques, clinical guidelines
 - Automatic embedding generation using Upstage API
 - Vector storage in Pinecone for semantic search
 - Dark theme UI for better readability
 
-### RAG Chatbot
-- Interactive chat interface for querying document content
-- Semantic search using Pinecone vector database
-- Context-aware responses using Upstage LLM
-- Clear vector storage functionality
-- Real-time chat history
-- Loading states and error handling
+### Therapeutic Conversation
+- Professional-grade psychological support interface
+- Evidence-based therapeutic responses informed by uploaded documents
+- Conversation memory that builds therapeutic rapport over time
+- Warm, empathetic tone with clear, structured formatting
+- Support for various therapeutic modalities (CBT, DBT, ACT, psychodynamic, etc.)
+- Crisis-aware responses with appropriate stabilization strategies
+- Reset vectors functionality for data management
 
 ## Project Structure
 
@@ -35,10 +33,9 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
 │   ├── api/
 │   │   ├── parse.js        # Document parsing endpoint
 │   │   ├── ingest.js       # Vector embedding storage
-│   │   ├── chat.js         # RAG chatbot endpoint
+│   │   ├── chat.js         # Therapeutic conversation endpoint
 │   │   └── delete-vectors.js # Vector cleanup
-│   ├── document-parser.js  # Parser interface
-│   ├── chatbot.js         # Chatbot interface
+│   ├── document-chat.js    # Therapeutic conversation interface
 │   └── index.js           # Landing page
 ├── .env.example           # Environment template
 └── .env.local            # Local environment vars
@@ -48,34 +45,37 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
 
 ### Document Processing Pipeline
 
-1. **Document Upload & Parsing**
-   - User uploads a document through the interface
+1. **Therapeutic Content Upload & Parsing**
+   - User uploads psychological resources through the interface
    - Document is sent to Upstage Document Parsing API
-   - API returns parsed HTML content
+   - API returns parsed HTML content optimized for therapeutic knowledge
 
 2. **Content Embedding**
    - Parsed HTML is split into meaningful chunks
-   - Special handling for different content types (tables, paragraphs, etc.)
+   - Special handling for different content types (therapeutic techniques, research findings, etc.)
    - Each chunk is embedded using Upstage Embedding API
    - Embeddings are stored in Pinecone with metadata
 
-### RAG Chatbot Pipeline
+### Therapeutic Conversation Pipeline
 
-1. **Query Processing**
-   - User submits a question
-   - Question is embedded using Upstage Embedding API
-   - Embedding is used to search Pinecone for relevant chunks
+1. **Query Understanding**
+   - User expresses thoughts, feelings or concerns
+   - Input is embedded using Upstage Embedding API
+   - Embedding is used to search Pinecone for relevant psychological insights
 
-2. **Context Retrieval**
+2. **Context Integration**
    - Top 15 most similar chunks are retrieved
    - High-quality matches (similarity > 0.7) are selected
-   - Chunks are organized by type and combined
+   - Previous conversation history is maintained for therapeutic continuity
+   - Contexts are organized by relevance and therapeutic value
 
-3. **Answer Generation**
-   - Context and question are sent to Upstage LLM (Or any LLM by API)
-   - LLM generates answer based solely on provided context
-   - Response is formatted based on query type
-   - System indicates if information isn't found
+3. **Therapeutic Response Generation**
+   - Combined context (RAG + conversation history) is sent to the language model
+   - Response generated with warm, empathetic, professional tone
+   - Structured formatting for improved readability
+   - Evidence-based insights from uploaded therapeutic resources
+   - Maintains ongoing therapeutic relationship
+   - Provides practical coping strategies and exercises when appropriate
 
 ## Getting Started
 
@@ -92,6 +92,7 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
    UPSTAGE_API_KEY=your_upstage_api_key
    PINECONE_API_KEY=your_pinecone_api_key
    PINECONE_INDEX_NAME=your_index_name
+   OPENAI_API_KEY=your_openai_api_key
    ```
 
 4. Create a Pinecone index:
@@ -110,17 +111,16 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
 
 ## Usage Guide
 
-1. **Document Parser** (`/document-parser`)
-   - Upload supported documents (PDF, PNG, JPG)
-   - View parsed content in multiple formats
+1. **Document Parser** (Accessible through the main interface)
+   - Upload therapeutic resources (PDF, PNG, JPG)
    - Content is automatically embedded and stored
-   - Navigate to chatbot using the "Go to Chatbot" button
+   - Focus on psychological research, therapeutic techniques, and mental health resources
 
-2. **RAG Chatbot** (`/chatbot`)
-   - Ask questions about uploaded documents
-   - View chat history with user and assistant messages
-   - Clear vector storage if needed
-   - Navigate back to parser using "Go to Parser" button
+2. **Therapeutic Assistant** (Main interface)
+   - Express thoughts, feelings, and concerns in a safe, confidential space
+   - Receive warm, empathetic, evidence-based responses
+   - Benefit from conversation memory that builds rapport over time
+   - Reset vectors if needed for data management
 
 ## API Integration
 
@@ -134,16 +134,16 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
    - Model: embedding-passage
    - Dimension: 4096
 
-3. **Chat Completions API**
-   - Endpoint: `https://api.upstage.ai/v1/chat/completions`
-   - Model: solar-1-mini-chat
-   - Temperature: 0.3 (optimized for consistency)
+3. **OpenAI API**
+   - Model: gpt-4o-mini
+   - Temperature: 0.4 (balanced for empathy and accuracy)
+   - Optimized for therapeutic conversation
 
 4. **Pinecone Vector Database**
    - Dense vector storage
    - Dimension: 4096
    - Distance: Cosine similarity
-   - Metadata storage for context
+   - Metadata storage for therapeutic context
 
 ## UI Components
 
@@ -154,36 +154,32 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
 - Loading indicators
 - Error messages
 
-### Chatbot
-- Clean, minimal chat interface
-- Message history with user/assistant styling
-- Real-time loading states
-- Input form with validation
-- Vector clearing functionality
-- Confirmation modal for destructive actions
+### Therapeutic Conversation
+- Soothing, professional design with therapeutic color scheme
+- Well-formatted message display with proper spacing and hierarchy
+- Structured responses with clear sections and emphasis
+- Real-time loading states with therapeutic language ("Listening..." vs "Loading...")
+- Modal feedback for operations
+- Reset vectors functionality
+- Conversation memory that maintains therapeutic context
 
 ## Error Handling
 
 - File type validation
 - API error handling
-- Loading states
-- User feedback
-- Graceful fallbacks
+- User-friendly modal feedback
+- Graceful fallbacks with therapeutic tone
+- Silent success for technical operations
 
-## Performance Considerations
-
-- Batch processing for embeddings
-- Efficient chunk storage
-- Semantic search optimization
-- Response caching
-- Minimal UI re-renders
-
-## Security
+## Security and Ethics
 
 - Environment variable protection
 - API key security
 - Input validation
 - Error message sanitization
+- Ethical guidelines for therapeutic interactions
+- Clear limitations about AI assistance vs. professional care
+- Crisis-aware response protocols
 
 ## Learn More
 
@@ -191,6 +187,7 @@ A Next.js application that demonstrates document parsing and RAG (Retrieval-Augm
 - [Upstage APIs](https://api.upstage.ai)
 - [Pinecone Documentation](https://docs.pinecone.io)
 - [RAG Architecture](https://www.pinecone.io/learn/retrieval-augmented-generation)
+- [Therapeutic Modalities](https://www.apa.org/topics/psychotherapy/approaches)
 
 ## Deploy on Vercel
 
@@ -212,7 +209,7 @@ Remember to:
 
 ### Additional Dependencies
 
-The project now includes these UI-related dependencies:
+The project includes these UI-related dependencies:
 
 ```bash
 @heroui/react
@@ -295,23 +292,3 @@ body {
   background: #ffffff;
 }
 ```
-
-### Using HeroUI Components
-
-You can import and use HeroUI components in your pages or components:
-
-```javascript
-import { Button } from "@heroui/react";
-
-function MyComponent() {
-  return <Button>Click me</Button>;
-}
-```
-
-### UI Development Notes
-
-- The project uses legacy peer dependencies due to some package version conflicts
-- HeroUI components are automatically styled with Tailwind CSS
-- Custom styles can be added through Tailwind CSS classes or global CSS
-- All HeroUI components are accessible out of the box
-- Built-in animations are powered by Framer Motion
