@@ -659,7 +659,7 @@ export default function RoomScene() {
 
               <GLBModel
                 url="/models/carpet.glb"
-                position={[1.1, -2.2, 0]}
+                position={[1.1, -2.35, 0]}
                 rotation={[0, 0, 0]}
                 scale={2.5}
                 materialColor="#2D1B3C"
