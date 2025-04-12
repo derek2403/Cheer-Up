@@ -1,5 +1,274 @@
+.chatbotWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.chatbotWrapperLarge {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 850px;
+  padding-top: 70px;
+  margin: 0 auto;
+}
+
+.contextSection {
+  margin-bottom: 30px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transform: scale(1);
+}
+
+.contextGlow {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background: radial-gradient(circle at center, rgba(173, 216, 230, 0.4) 0%, rgba(173, 216, 230, 0) 70%);
+  z-index: -1;
+  filter: blur(25px);
+}
+
+.contextContent {
+  padding: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.contextHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.contextIcon {
+  color: #0083b0;
+  margin-right: 12px;
+}
+
+.contextTitle {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #00b4db, #0083b0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contextDescription {
+  font-size: 1.05rem;
+  color: #444;
+  margin-bottom: 22px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.contextList {
+  font-size: 1rem;
+  color: #333;
+  margin: 0 0 25px;
+  padding: 0;
+  line-height: 1.6;
+  list-style: none;
+}
+
+.contextList li {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  padding: 7px 12px;
+  background: rgba(0, 131, 176, 0.05);
+  border-radius: 10px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.contextList li:hover {
+  transform: translateX(5px);
+  background: rgba(0, 131, 176, 0.1);
+}
+
+.emojiIcon {
+  font-size: 1.3rem;
+  margin-right: 10px;
+  display: inline-block;
+}
+
+.securityNoteContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  background: rgba(0, 131, 176, 0.05);
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 131, 176, 0.3);
+}
+
+.securityNote {
+  font-size: 0.95rem;
+  color: #555;
+  font-style: italic;
+  margin: 0;
+}
+
+.contextDropZone {
+  border: 2px dashed rgba(0, 131, 176, 0.4);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(0, 131, 176, 0.05);
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.contextDropZone:hover, .contextDropZone.dragging {
+  border-color: rgba(0, 131, 176, 0.8);
+  background: rgba(0, 131, 176, 0.1);
+  transform: scale(1.01);
+}
+
+.uploadIconContainer {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
+.uploadEmoji {
+  font-size: 2.8rem;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.uploadGlow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at center, rgba(0, 131, 176, 0.3) 0%, rgba(0, 131, 176, 0) 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.dropZoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+}
+
+.dropZoneContent p {
+  margin: 0 0 8px;
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: #333;
+}
+
+.dropZoneContent span {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.fileList {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 22px;
+  border-radius: 10px;
+  background: rgba(0, 131, 176, 0.05);
+  padding: 12px;
+}
+
+.fileListHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(0, 131, 176, 0.3);
+}
+
+.fileListHeader h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease-out;
+  transition: transform 0.2s;
+}
+
+.fileItem:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+}
+
+.fileIcon {
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.fileName {
+  flex: 1;
+  font-size: 0.95rem;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.removeFileBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 77, 77, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 10px;
+}
+
+.removeFileBtn:hover {
+  background: rgba(255, 77, 77, 0.2);
+  transform: scale(1.1);
+}
+
 .chatbotContainer {
-  width: 400px;
+  width: 100%;
   height: 600px;
   border-radius: 20px;
   overflow: hidden;
@@ -11,6 +280,80 @@
   position: relative;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fileUploadSection {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.uploadTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+.uploadDescription {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.documentTypes {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 10px 20px;
+  padding: 0;
+  line-height: 1.4;
+}
+
+.documentTypes li {
+  margin-bottom: 4px;
+}
+
+.dropZone {
+  border: 2px dashed rgba(0, 123, 255, 0.4);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.5);
+  margin-bottom: 15px;
+}
+
+.dropZone:hover, .dragging .dropZone {
+  border-color: rgba(0, 123, 255, 0.8);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.dropZoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+}
+
+.dropZoneContent svg {
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.dropZoneContent p {
+  margin: 0 0 8px;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.dropZoneContent span {
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .chatHeader {
@@ -153,5 +496,16 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 } 
