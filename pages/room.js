@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import ModelLoader from '../components/ModelLoader'
 import { OrbitControls, Environment, PerspectiveCamera, useGLTF } from '@react-three/drei'
 import { Suspense } from 'react'
+import GalaxyBackground from '../components/GalaxyBackground'
 
 function GLBModel({ url, position, rotation, scale, materialColor }) {
   const { scene } = useGLTF(url)
@@ -23,7 +24,7 @@ function GLBModel({ url, position, rotation, scale, materialColor }) {
 
 export default function RoomScene() {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100vw', height: '100vh', background: 'black' }}>
       <Canvas>
         <PerspectiveCamera makeDefault position={[0, 2, 5]} fov={60} />
         <ambientLight intensity={0.5} />
@@ -31,6 +32,8 @@ export default function RoomScene() {
         <spotLight position={[0, 5, 0]} angle={0.5} penumbra={1} intensity={1} />
         
         <Suspense fallback={null}>
+          <GalaxyBackground />
+          
           {/* Back wall */}
           <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
             <boxGeometry args={[10, 4, 0.2]} />
