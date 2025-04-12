@@ -234,26 +234,40 @@ Here's a quick reference to the major directories and files in this project, alo
 
 Our solution leverages cutting-edge services from three strategic partners to deliver a robust, adaptive, and secure mental healthcare experience:
 
-### Upstage API 
+### NEAR AI
+- **Subscription & Decentralized Access:**  
+  Our platform integrates with the NEAR blockchain for secure, subscription-based access. Users log in using their NEAR wallet and subscribe via smart contracts that handle payments (1 NEAR/month).  
+- **Agent Deployment:**  
+  Post-subscription, our AI agent is deployed on the NEAR AI Hub, ensuring that our mental healthcare assistant is easily accessible while maintaining robust privacy and data protection.  
+  - **Example Deployment URL:**  
+    [NEAR AI Agent - Cheer-Up](https://app.near.ai/agents/b0295de098510871f845a7aa74d0ac50149a630a382a23e974f7961b2ae40dfd/Cheer-Up/latest)
+
+### Upstage API
 - **Document Processing & Embeddings:**  
-  We call Upstage’s APIs to parse user-uploaded documents and generate high-quality embeddings. These embeddings are stored in our local Qdrant vector database, allowing us to quickly query similar content and enhance our Retrieval-Augmented Generation (RAG) pipeline.  
+  We call Upstage’s APIs to parse user-uploaded documents and generate high-quality embeddings. These embeddings are stored in our local Qdrant vector database, allowing us to quickly query similar content and enhance our Retrieval-Augmented Generation (RAG) pipeline.
 - **Enhanced Contextual Guidance:**  
   With the precise context extracted from personal documents, our AI psychiatrist delivers more accurate and personalized recommendations during sessions, ensuring that each interaction is deeply informed by the user's history.
+  - **View the Integration:**  
+    Check out our [TherapeuticChat component](https://github.com/derek2403/Cheer-Up/blob/main/components/TherapeuticChat.js)
 
-### Gensyn Swarm 
+### Gensyn Swarm
 - **Adaptive Reinforcement Learning:**  
   Our RL-Swarm module, housed in the `rl-swarm/` directory, harnesses Gensyn’s distributed reinforcement learning network. This swarm continuously analyzes anonymized session data and user feedback to refine the AI's guidance prompts for future use.
 - **Collaborative Model Updates:**  
   Acting as a dynamic "roundtable" of models, the swarm shares and collectively enhances insights, ensuring that our system’s responses evolve to meet users’ changing needs over time.
-
-### NEAR AI 
-- **Subscription & Decentralized Access:**  
-  Our platform integrates with the NEAR blockchain for secure, subscription-based access. Users log in using their NEAR wallet and subscribe via smart contracts that handle payments (1 NEAR/month).
-- **Agent Deployment:**  
-  Post-subscription, our AI agent is deployed on the NEAR AI Hub, ensuring that our mental healthcare assistant is easily accessible while maintaining robust privacy and data protection.
+- **Example Setup for Gensyn Swarm:**  
+  To run our swarm locally, you can navigate to the `rl-swarm` directory, activate the virtual environment, and execute the training script as shown below:
   
+  ```bash
+  RG_ID=$(awk 'BEGIN { FS = "\"" } !/^[ \t]*[{}]/ { print $(NF - 1); exit }' modal-login/temp-data/userData.json)
+  CONFIG_PATH="hivemind_exp/configs/mac/grpo-qwen-2.5-0.5b-deepseek-r1.yaml"
+  IDENTITY_PATH="$PWD/swarm.pem"
 
-
+  python -m hivemind_exp.gsm8k.train_single_gpu \
+       --hf_token "None" \
+       --identity_path "$IDENTITY_PATH" \
+       --config "$CONFIG_PATH"
+  
 
 
 ## Future Implementations 🚀
