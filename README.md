@@ -1,10 +1,10 @@
 
 # Cure Me Baby👇
-**AI Psychiatrist in a TEE with Gensyn Swarm and NEAR Subscription**
+**Empowering mental wellness with a gamified AI psychiatrist that delivers personalized, adaptive care and real-time progress insights in a TEE**
 
 ![Logo](https://github.com/derek2403/Cheer-Up/blob/main/public/logo.png?raw=true)
 
-AI-driven mental healthcare assistant securely running in a TEE, powered by Gensyn’s distributed swarm for adaptive and personalize learning about te patient to give more accurate context and guidance to the user the right way and integrated with NEAR for subscription-based access.
+An AI-driven mental healthcare assistant securely operating within a TEE, leveraging Gensyn’s swarm and Upstage's RAG to adaptively learn about each patient and provide personalized, context-aware guidance—all accessible via NEAR subscription.
 
 ---
 
