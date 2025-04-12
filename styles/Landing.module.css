@@ -1,95 +1,175 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
 
 .container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.backgroundGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e6f7ff 0%, #ADD8E6 100%);
+  z-index: -1;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.content {
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 4rem;
+  font-weight: 700;
+  color: #4682B4;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.2rem;
+  color: #5F9EA0;
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+}
+
+.enterButton {
+  background: linear-gradient(90deg, #87CEEB 0%, #ADD8E6 100%);
+  color: white;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  padding: 0.8rem 3rem;
+  border-radius: 50px;
+  text-decoration: none;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 15px rgba(173, 216, 230, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.enterButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(173, 216, 230, 0.7);
+}
+
+.cardGridContainer {
+  width: 700px;
+  overflow: hidden;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 15px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: rgba(255, 220, 220, 0.1);
+}
+
+.cardGrid {
+  display: flex;
+  animation: scroll 40s linear infinite;
+  width: max-content;
+  padding: 1rem 0;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.card {
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(173, 216, 230, 0.3);
+  transition: transform 0.3s ease;
+  width: 180px;
+  height: 180px;
+  margin: 0 0.75rem;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 3rem;
   }
   
-  .backgroundVideo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2.5rem;
   }
   
-  .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    text-align: center;
-    height: 100%;
-    z-index: 10;
-    position: relative;
-    padding-top: 400px;
-    padding-bottom: 30px;
+  .cardGrid {
+    grid-template-columns: 1fr;
   }
-  
-  .startButton {
-    margin-top: 2rem;
-    padding: 0.8rem 2rem;
-    background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%);
-    color: white;
-    border-radius: 50px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: none;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    animation: pulse 2s infinite;
-    font-family: 'Quicksand', sans-serif;
-    letter-spacing: 0.5px;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  
-  .startButton:hover {
-    transform: translateY(-3px);
-    box-shadow: none;
-    background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%);
-    animation: none;
+  50% {
+    transform: scale(1.05);
   }
-  
-  .buttonText {
-    margin-right: 10px;
-    font-weight: 700;
+  100% {
+    transform: scale(1);
   }
-  
-  .arrow {
-    transition: transform 0.3s ease;
-  }
-  
-  .startButton:hover .arrow {
-    transform: translateX(5px);
-  }
-  
-  .main {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* Pulse animation */
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
+}
