@@ -29,9 +29,7 @@ export default function header() {
           </ul>
         </nav>
 
-        <div className={styles.contactButton}>
           <ConnectWallet />
-        </div>
       </div>
     </header>
   );
