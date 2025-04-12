@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useWalletSelector } from '@near-wallet-selector/react-hook';
 import styles from '../styles/app.module.css';
-import { HelloNearContract } from '../config';
-import { Navigation } from '../components/navigation';
+import { ConnectWallet } from '../components/ConnectWallet';
+import { NetworkId } from '../config';
+
+// Update contract address to the deployed contract
+const SUBSCRIPTION_CONTRACT = 'smartcontract3.testnet';
 
 export default function MetaMaskTest() {
-  const { signedAccountId, viewFunction, callFunction, signIn, signOut } = useWalletSelector();
+  const { signedAccountId, viewFunction, callFunction } = useWalletSelector();
   
   const [nearWallet, setNearWallet] = useState(null);
   const [ethWallet, setEthWallet] = useState(null);
-  const [greeting, setGreeting] = useState('loading...');
-  const [newGreeting, setNewGreeting] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
+  const [contractChecked, setContractChecked] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     // Set login status based on NEAR wallet
@@ -20,13 +23,13 @@ export default function MetaMaskTest() {
     
     if (signedAccountId) {
       setNearWallet(signedAccountId);
+      
+      // Only check contract once when wallet connects
+      if (!contractChecked) {
+        setContractChecked(true);
+      }
     }
-    
-    // Get greeting from contract
-    viewFunction({ contractId: HelloNearContract, method: 'get_greeting' })
-      .then((greeting) => setGreeting(greeting))
-      .catch(err => console.error("Error fetching greeting:", err));
-  }, [signedAccountId]);
+  }, [signedAccountId, contractChecked]);
   
   // Function to connect to MetaMask
   const connectMetaMask = async () => {
@@ -52,118 +55,106 @@ export default function MetaMaskTest() {
     setEthWallet(null);
   };
   
-  // Function to save greeting to NEAR contract
-  const saveGreeting = async () => {
+  // Function to subscribe by paying NEAR
+  const subscribe = async () => {
     if (!signedAccountId) {
       alert("Please connect to NEAR wallet first");
       return;
     }
     
     setShowSpinner(true);
+    setErrorMessage('');
     
     try {
-      // Call the contract
+      // Use a fixed amount of NEAR (1 NEAR) for subscription to avoid conversion issues
+      const depositAmount = "1000000000000000000000000"; // 1 NEAR in yoctoNEAR
+      
+      // Call the subscribe method with attached deposit
       await callFunction({ 
-        contractId: HelloNearContract, 
-        method: 'set_greeting', 
-        args: { greeting: newGreeting } 
+        contractId: SUBSCRIPTION_CONTRACT, 
+        method: 'subscribe',
+        args: {},
+        deposit: depositAmount
       });
       
-      // Update the UI
-      const updatedGreeting = await viewFunction({ 
-        contractId: HelloNearContract, 
-        method: 'get_greeting' 
-      });
-      
-      setGreeting(updatedGreeting);
-      setNewGreeting('');
+      alert("Successfully subscribed!");
     } catch (error) {
-      console.error("Error saving greeting:", error);
-      alert("Failed to save greeting. See console for details.");
+      console.error("Error subscribing:", error);
+      // Extract the error message from the error object
+      let errorMsg = "Failed to subscribe. See console for details.";
+      
+      if (error.message && error.message.includes("cannot read property 'keyPrefix'")) {
+        errorMsg = "The subscription contract has not been initialized properly. Please contact the administrator.";
+      }
+      
+      setErrorMessage(errorMsg);
+      alert(errorMsg);
     } finally {
       setShowSpinner(false);
     }
   };
 
   return (
-    <>
-      <Navigation />
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <h1>Wallet Integration Test Page</h1>
-          <p>
-            Interacting with the contract: &nbsp;
-            <code className={styles.code}>{HelloNearContract}</code>
-          </p>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Subscription Demo</h1>
+      
+      <div className={styles.walletSection}>
+        <ConnectWallet />
+        
+        {/* Connect to MetaMask section */}
+        <div className={styles.metaMaskSection}>
+          <h2>Connect to MetaMask (Optional)</h2>
+          {!ethWallet ? (
+            <button onClick={connectMetaMask} className={styles.button}>
+              Connect MetaMask
+            </button>
+          ) : (
+            <div>
+              <p>Connected: {ethWallet.substring(0, 6)}...{ethWallet.substring(ethWallet.length - 4)}</p>
+              <button onClick={disconnectMetaMask} className={styles.button}>
+                Disconnect MetaMask
+              </button>
+            </div>
+          )}
         </div>
-
-        <div className="container py-4">
-          <div className="row mb-4">
-            <div className="col-md-6">
-              <div className="card">
-                <div className="card-header">NEAR Wallet</div>
-                <div className="card-body">
-                  {nearWallet ? (
-                    <>
-                      <p>Connected: <code>{nearWallet}</code></p>
-                      <button className="btn btn-danger" onClick={signOut}>Disconnect</button>
-                    </>
-                  ) : (
-                    <button className="btn btn-primary" onClick={signIn}>Connect NEAR Wallet</button>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="card">
-                <div className="card-header">Ethereum Wallet (MetaMask)</div>
-                <div className="card-body">
-                  {ethWallet ? (
-                    <>
-                      <p>Connected: <code>{ethWallet}</code></p>
-                      <button className="btn btn-danger" onClick={disconnectMetaMask}>Disconnect</button>
-                    </>
-                  ) : (
-                    <button className="btn btn-primary" onClick={connectMetaMask}>Connect MetaMask</button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+      </div>
+      
+      {loggedIn && (
+        <div className={styles.subscriptionSection}>
+          <h2>Subscription Details</h2>
           
-          <div className="card mb-4">
-            <div className="card-header">Contract Interaction</div>
-            <div className="card-body">
-              <h3>The contract says: <code>{greeting}</code></h3>
-              
-              <div className="input-group mt-3" hidden={!loggedIn}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Store a new greeting"
-                  value={newGreeting}
-                  onChange={(e) => setNewGreeting(e.target.value)}
-                />
-                <div className="input-group-append">
-                  <button className="btn btn-secondary" onClick={saveGreeting} disabled={showSpinner}>
-                    {showSpinner ? (
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    ) : (
-                      'Save'
-                    )}
-                  </button>
-                </div>
+          <div className={styles.subscriptionInfo}>
+            <p>Subscription Price: 1 NEAR</p>
+            
+            {errorMessage && (
+              <div className={styles.errorMessage}>
+                <p>⚠️ {errorMessage}</p>
               </div>
-              
-              {!loggedIn && (
-                <div className="alert alert-warning mt-3">
-                  Please connect to NEAR wallet to interact with the contract
-                </div>
-              )}
+            )}
+            
+            <button 
+              onClick={subscribe} 
+              className={styles.button}
+              disabled={showSpinner}
+            >
+              {showSpinner ? 'Processing...' : 'Subscribe Now'}
+            </button>
+            
+            <div className={styles.note}>
+              <p><small>Note: This will send 1 NEAR to the subscription contract.</small></p>
             </div>
           </div>
         </div>
-      </main>
-    </>
+      )}
+      
+      {loggedIn && (
+        <div className={styles.contractInfo}>
+          <h3>Technical Information</h3>
+          <p>Contract Address: {SUBSCRIPTION_CONTRACT}</p>
+          <p>Network: {NetworkId}</p>
+          <p>Connected Account: {signedAccountId}</p>
+        </div>
+      )}
+    </div>
   );
 } 

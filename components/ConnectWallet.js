@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useWalletSelector } from '@near-wallet-selector/react-hook';
 
-export const Navigation = () => {
+export const ConnectWallet = () => {
   const [action, setAction] = useState(() => { });
   const [label, setLabel] = useState('Loading...');
   const { signedAccountId, signIn, signOut } = useWalletSelector();
@@ -20,16 +20,7 @@ export const Navigation = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
-        <Link href="/" className="navbar-brand">
-          NEAR + ETH Demo
-        </Link>
         <div className="navbar-nav ml-auto">
-          <Link href="/" className="nav-link">
-            Home
-          </Link>
-          <Link href="/metamask-test" className="nav-link">
-            Wallet Test
-          </Link>
           <button className="btn btn-outline-primary ms-2" onClick={action}>
             {label}
           </button>
