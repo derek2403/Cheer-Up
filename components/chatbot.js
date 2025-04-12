@@ -66,6 +66,14 @@ Feel free to share what's on your mind, or if you prefer, you can start by uploa
     
     setLoading(true);
     
+    // Add loading message
+    const loadingMessage = {
+      text: "Thinking...",
+      sender: 'bot',
+      isLoading: true
+    };
+    setMessages(prev => [...prev, loadingMessage]);
+    
     try {
       // Format messages for the API
       const apiMessages = messages
@@ -92,18 +100,24 @@ Feel free to share what's on your mind, or if you prefer, you can start by uploa
 
       const data = await response.json();
       
-      // Add assistant message to chat with proper formatting
-      setMessages(prev => [...prev, { 
-        text: data.answer, 
-        sender: 'bot' 
-      }]);
+      // Remove loading message and add assistant message
+      setMessages(prev => {
+        const filtered = prev.filter(msg => !msg.isLoading);
+        return [...filtered, { 
+          text: data.answer, 
+          sender: 'bot' 
+        }];
+      });
     } catch (error) {
       console.error('Error:', error);
-      // Add error message to chat with proper formatting
-      setMessages(prev => [...prev, { 
-        text: `**Error**\n\nI apologize, but I encountered an issue processing your message. Please try again.`, 
-        sender: 'bot' 
-      }]);
+      // Remove loading message and add error message
+      setMessages(prev => {
+        const filtered = prev.filter(msg => !msg.isLoading);
+        return [...filtered, { 
+          text: `**Error**\n\nI apologize, but I encountered an issue processing your message. Please try again.`, 
+          sender: 'bot' 
+        }];
+      });
     } finally {
       setLoading(false);
       setInput('');
@@ -419,54 +433,64 @@ Feel free to share what's on your mind, or if you prefer, you can start by uploa
           {messages.map((message, index) => (
             <div 
               key={index} 
-              className={`${styles.message} ${styles[message.sender]} ${message.type === 'welcome' ? styles.welcome : ''}`}
+              className={`${styles.message} ${styles[message.sender]} ${message.type === 'welcome' ? styles.welcome : ''} ${message.isLoading ? styles.loading : ''}`}
             >
-              {message.text.split('\n\n').map((paragraph, i) => {
-                // Handle section titles (bolded text)
-                if (paragraph.trim().startsWith('**') && paragraph.trim().endsWith('**')) {
-                  return (
-                    <h3 key={i} className={styles.sectionTitle}>
-                      {paragraph.replace(/\*\*/g, '')}
-                    </h3>
-                  );
-                }
-                
-                // Handle bullet points with emphasis
-                if (paragraph.trim().startsWith('- **')) {
-                  const [title, ...content] = paragraph.substring(2).split('**');
-                  return (
-                    <div key={i} className={styles.bulletPoint}>
-                      <strong>{title.trim()}</strong>
-                      {content.join('').replace(/\*\*/g, '')}
-                    </div>
-                  );
-                }
+              {message.isLoading ? (
+                <div className={styles.loadingContainer}>
+                  <div className={styles.loadingDots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              ) : (
+                message.text.split('\n\n').map((paragraph, i) => {
+                  // Handle section titles (bolded text)
+                  if (paragraph.trim().startsWith('**') && paragraph.trim().endsWith('**')) {
+                    return (
+                      <h3 key={i} className={styles.sectionTitle}>
+                        {paragraph.replace(/\*\*/g, '')}
+                      </h3>
+                    );
+                  }
+                  
+                  // Handle bullet points with emphasis
+                  if (paragraph.trim().startsWith('- **')) {
+                    const [title, ...content] = paragraph.substring(2).split('**');
+                    return (
+                      <div key={i} className={styles.bulletPoint}>
+                        <strong>{title.trim()}</strong>
+                        {content.join('').replace(/\*\*/g, '')}
+                      </div>
+                    );
+                  }
 
-                // Handle regular bullet points
-                if (paragraph.trim().startsWith('- ')) {
-                  return (
-                    <div key={i} className={styles.bulletPoint}>
-                      {paragraph.substring(2)}
-                    </div>
-                  );
-                }
+                  // Handle regular bullet points
+                  if (paragraph.trim().startsWith('- ')) {
+                    return (
+                      <div key={i} className={styles.bulletPoint}>
+                        {paragraph.substring(2)}
+                      </div>
+                    );
+                  }
 
-                // Handle numbered items
-                if (paragraph.match(/^\d+\.\s/)) {
-                  return (
-                    <div key={i} className={styles.numberedItem}>
+                  // Handle numbered items
+                  if (paragraph.match(/^\d+\.\s/)) {
+                    return (
+                      <div key={i} className={styles.numberedItem}>
+                        {paragraph}
+                      </div>
+                    );
+                  }
+
+                  // Handle regular paragraphs
+                  return paragraph.trim() ? (
+                    <p key={i} className={styles.messageParagraph}>
                       {paragraph}
-                    </div>
-                  );
-                }
-
-                // Handle regular paragraphs
-                return paragraph.trim() ? (
-                  <p key={i} className={styles.messageParagraph}>
-                    {paragraph}
-                  </p>
-                ) : null;
-              })}
+                    </p>
+                  ) : null;
+                })
+              )}
             </div>
           ))}
           <div ref={messagesEndRef} />

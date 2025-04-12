@@ -656,13 +656,20 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.sendButton:hover {
+.sendButton:not(:disabled):hover {
   transform: scale(1.05);
   box-shadow: 0 2px 10px rgba(0, 131, 176, 0.5);
 }
 
-.sendButton:active {
+.sendButton:not(:disabled):active {
   transform: scale(0.95);
+}
+
+.sendButton:disabled {
+  background: linear-gradient(135deg, #a0a0a0, #808080);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 @keyframes pulse {
@@ -674,5 +681,50 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+.message.loading {
+  background: rgba(255, 255, 255, 0.1);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.loadingDots {
+  display: flex;
+  gap: 8px;
+}
+
+.loadingDots span {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loadingDots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loadingDots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { 
+    transform: scale(0);
+  }
+  40% { 
+    transform: scale(1.0);
   }
 } 
