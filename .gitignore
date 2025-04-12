@@ -36,5 +36,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+
+/smartcontract/build
+
+/smartcontract/node_modules
+
 /data
 /ai-prompts
+
