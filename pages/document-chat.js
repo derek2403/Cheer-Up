@@ -157,7 +157,7 @@ export default function DocumentChatPage() {
                     <div className="content">
                       {message.role === 'assistant' ? (
                         <div className="formatted-message">
-                          {message.content.split('\n\n').map((paragraph, i) => {
+                          {message.content ? message.content.split('\n\n').map((paragraph, i) => {
                             // Handle section titles
                             if (paragraph.trim().startsWith('**') && paragraph.trim().endsWith('**')) {
                               return (
@@ -202,7 +202,7 @@ export default function DocumentChatPage() {
                                 {paragraph}
                               </p>
                             );
-                          })}
+                          }) : <p className="message-paragraph">No response content available.</p>}
                         </div>
                       ) : (
                         <div className="user-message">

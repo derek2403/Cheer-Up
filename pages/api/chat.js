@@ -170,7 +170,8 @@ Remember to conclude your response with an invitation for further discussion, re
 
     // 6. Send to OpenAI GPT-4o-mini
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.REDPILL_API_KEY,
+      baseURL: "https://api.redpill.ai/v1",
     });
 
     // Convert conversation history to OpenAI message format
@@ -180,7 +181,7 @@ Remember to conclude your response with an invitation for further discussion, re
     }));
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "phala/llama-3.3-70b-instruct",
       messages: [
         { 
           role: 'system', 
@@ -193,7 +194,11 @@ Remember to conclude your response with an invitation for further discussion, re
       max_tokens: 1000
     });
 
-    const answer = completion.choices[0].message.content;
+    // Ensure we have a valid response with content
+    const answer = completion?.choices?.[0]?.message?.content || "I apologize, but I couldn't generate a response at this time. Please try again.";
+
+    // Log the response structure for debugging
+    console.log('API Response Structure:', JSON.stringify(completion, null, 2));
 
     // 7. Return the answer
     return res.status(200).json({ answer });
