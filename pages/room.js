@@ -92,6 +92,20 @@ function Character({ floorMesh, onMoveComplete }) {
           const roomPoint = clickPoint.clone()
           roomPoint.applyMatrix4(new THREE.Matrix4().makeRotationY(-roomRotation))
           
+          // Log coordinates
+          console.log('Click coordinates:', {
+            world: {
+              x: clickPoint.x.toFixed(2),
+              y: clickPoint.y.toFixed(2),
+              z: clickPoint.z.toFixed(2)
+            },
+            room: {
+              x: roomPoint.x.toFixed(2),
+              y: roomPoint.y.toFixed(2),
+              z: roomPoint.z.toFixed(2)
+            }
+          })
+          
           // Check if point is within floor bounds
           if (Math.abs(roomPoint.x) <= 5 && Math.abs(roomPoint.z) <= 5) {
             targetPositionRef.current.copy(clickPoint)
@@ -361,13 +375,49 @@ function WalkableAreaHelper() {
 // TV component with click handling
 function TVModel({ position, rotation, scale }) {
   const router = useRouter()
+  const [isMoving, setIsMoving] = useState(false)
+  const [currentMoveStep, setCurrentMoveStep] = useState(0)
   
-  const handleClick = () => {
-    router.push('/chatbot')
+  const moveToTV = () => {
+    if (!isMoving) {
+      setIsMoving(true)
+      setCurrentMoveStep(0)
+      
+      // Convert first target position to room's coordinate system
+      const firstPos = new THREE.Vector3(1.96, -1.90, 2.41)
+      const secondPos = new THREE.Vector3(-0.62, -1.90, 3.76)
+      const roomRotation = Math.PI * 0.65
+      
+      firstPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
+      secondPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), roomRotation)
+      
+      // Trigger first movement
+      const moveEvent = new CustomEvent('moveCharacter', {
+        detail: {
+          position: firstPos,
+          onComplete: () => {
+            // After reaching first position, move to second position
+            setCurrentMoveStep(1)
+            const secondMoveEvent = new CustomEvent('moveCharacter', {
+              detail: {
+                position: secondPos,
+                onComplete: () => {
+                  setIsMoving(false)
+                  setCurrentMoveStep(0)
+                  router.push('/chatbot')
+                }
+              }
+            })
+            window.dispatchEvent(secondMoveEvent)
+          }
+        }
+      })
+      window.dispatchEvent(moveEvent)
+    }
   }
   
   return (
-    <group position={position} rotation={rotation} scale={scale} onClick={handleClick}>
+    <group position={position} rotation={rotation} scale={scale} onClick={moveToTV}>
       <ModelLoader
         modelPath="/models/TV.obj"
         mtlPath="/models/TV.mtl"
