@@ -639,74 +639,105 @@ export default function RoomScene() {
               scale={1.5}
             />
 
+              {/* TV Stand */}
+
+              <GLBModel
+                url="/models/TV_stand.glb"
+                position={[-3, -2, -4.4]}
+                rotation={[0, 0, 0]}
+                scale={1.8}
+                materialColor="#2D1B3C"
+              />
+
               {/* TV */}
               <TVModel
                 position={[-3, -0.8, -4.4]}
-                rotation={[0, -Math.PI/2, 0]}
+                rotation={[0, -Math.PI / 2, 0]}
                 scale={1.5}
               />
 
-              {/* Carpet */}
-              <ModelLoader
-                modelPath="/models/carpet.obj"
-                mtlPath="/models/carpet.mtl"
-                position={[1.1, -1.95, 0]}
+
+              <GLBModel
+                url="/models/carpet.glb"
+                position={[1.1, -2.2, 0]}
                 rotation={[0, 0, 0]}
-                scale={3}
+                scale={2.5}
+                materialColor="#2D1B3C"
               />
 
-              {/* Tall Flower */}
-              <ModelLoader
-                modelPath="/models/tall_flower.obj"
-                mtlPath="/models/tall_flower.mtl"
+              
+              {/* left flower */}
+              <GLBModel
+                url="/models/tall_flower2.glb"
                 position={[4, -1.9, -4]}
                 rotation={[0, 0, 0]}
-                scale={1.5}
+                scale={1.3}
+                materialColor="#2D1B3C"
+              />
+              {/* Right flower */}
+              <GLBModel
+                url="/models/tall_flower.glb"
+                position={[4, -1.9, 3.4]}
+                rotation={[0, 0, 0]}
+                scale={1.3}
+                materialColor="#2D1B3C"
               />
 
-              {/* Wall Lamp */}
-              <ModelLoader
-                modelPath="/models/wall_lamp.obj"
-                mtlPath="/models/wall_lamp.mtl"
-                position={[4.0, 1.5, -4.9]}
-                rotation={[0, -Math.PI/2, 0]}
-                scale={1.5}
+              <GLBModel
+                url="/models/wall_lamp2.glb"
+                position={[4.4, 0.6, 3.5]}
+                rotation={[0, -Math.PI / 2, 0]}
+                scale={0.8}
+                materialColor="#2D1B3C"
+              />
+
+              <GLBModel
+                url="/models/wallLamp.glb"
+                position={[4.0, 0.6, -4.2]}
+                rotation={[0, 0, 0]}
+                scale={0.8}
+                materialColor="#2D1B3C"
+              />
+              
+
+              <GLBModel
+                url="/models/picture_frame.glb"
+                position={[4.8, 0, -3.5]}
+                rotation={[0, -Math.PI / 2, 0]}
+                scale={1}
+                materialColor="#2D1B3C"
               />
 
               {/* Rack */}
               <GLBModel
                 url="/models/rack1.glb"
                 position={[4.6, -2, 0]}
-                rotation={[0, -Math.PI/2, 0]}
+                rotation={[0, -Math.PI / 2, 0]}
                 scale={2}
                 materialColor="#2D1B3C"
               />
-              
-              {/* Left curtain */}
-              <ModelLoader
-                modelPath="/models/curtains.obj"
-                mtlPath="/models/curtains.mtl"
-                position={[1, -1.8, -4.3]}
-                rotation={[0, -Math.PI / 2, 0]}
-                scale={1.1}
-              />
-            
-              {/* Window */}
-              <ModelLoader
-                modelPath="/models/window.obj"
-                mtlPath="/models/window.mtl"
-                position={[1, -1.8, -4.7]}  
-                rotation={[0, -Math.PI/2, 0]}
-                scale={1.1}
+              <GLBModel
+                url="/models/curtains.glb"
+                position={[1, -0.2, -4.3]}
+                rotation={[0, 0, 0]}
+                scale={2}
+                materialColor="#2D1B3C"
               />
 
-              {/* Sofa */}
-              <ModelLoader
-                modelPath="/models/sofa.obj"
-                mtlPath="/models/sofa.mtl"
-                position={[1, -2, -3.7]}
-                rotation={[0, -Math.PI/2, 0]}
+              <GLBModel
+                url="/models/window.glb"
+                position={[1, -0.3, -4.6]}
+                rotation={[0, 0, 0]}
                 scale={1.8}
+                materialColor="#2D1B3C"
+              />
+
+              <GLBModel
+                url="/models/sofa.glb"
+                position={[1, -2, -3.5]}
+                rotation={[0, 0, 0]}
+                scale={2.1}
+                materialColor="#2D1B3C"
               />
             </group>
           </Suspense>

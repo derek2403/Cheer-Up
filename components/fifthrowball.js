@@ -39,7 +39,9 @@ export default function FifthRowBall() {
         clickable: true,
         bling: true,
         hardcodedImage: '/data/img/1.png',
-        hardcodedText: 'I am tired because I have a lot of work to do. The constant deadlines and pressure are draining my energy, and I find it difficult to keep up with all my responsibilities. Despite my best efforts, there seems to be an endless stream of tasks that need my attention.'
+        hardcodedText: 'I feel overwhelmed by a profound sense of exhaustion. The weight of endless deadlines and mounting responsibilities has become increasingly difficult to bear. Each day feels like a struggle to keep up, and despite my best efforts, the tasks continue to multiply. This constant pressure has begun to affect not just my energy levels, but my overall wellbeing.',
+        date: 'October 15, 2023',
+        time: '3:47 PM'
       },
       { 
         color: '#FFD700', 
@@ -49,7 +51,9 @@ export default function FifthRowBall() {
         clickable: true,
         bling: true,
         hardcodedImage: '/data/img/2.png',
-        hardcodedText: 'You\'re feeling completely overwhelmed and consumed by sadness right now, struggling to cope with the pain of a recent breakup. Your emotions are raw and intense, leaving you feeling exhausted and drained after hours of crying. You\'re navigating a storm of thoughts and memories that are difficult to process, and it\'s hard to find a sense of calm or comfort.'
+        hardcodedText: 'The pain of this recent breakup has left you completely devastated. Your emotions are raw and overwhelming, making it difficult to find even a moment of peace. Hours of crying have left you physically and emotionally drained. Memories keep flooding back at unexpected moments, making it nearly impossible to focus on anything else. This storm of emotions feels all-consuming, but remember that even the darkest clouds eventually pass.',
+        date: 'February 28, 2024',
+        time: '11:23 PM'
       },
       { 
         color: '#8A2BE2', 
@@ -58,7 +62,9 @@ export default function FifthRowBall() {
         story: 'Fear: This memory orb embodies the cautious moments that kept you safe and taught valuable lessons.',
         clickable: true, 
         bling: true,
-        useApi: true
+        useApi: true,
+        date: 'July 4, 2023',
+        time: '2:15 AM'
       },
       { 
         color: '#FF4500', 
@@ -336,7 +342,8 @@ export default function FifthRowBall() {
               transformOrigin: 'center center',
               maxWidth: '90%',
               maxHeight: '90%',
-              transition: 'transform 0.05s ease-out'
+              transition: 'transform 0.05s ease-out',
+              borderRadius: '30px'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -349,16 +356,25 @@ export default function FifthRowBall() {
                 selectedBall.color === '#2E8B57' ? '46, 139, 87' : 
                 selectedBall.color === '#8A2BE2' ? '138, 43, 226' : 
                 selectedBall.color === '#FF4500' ? '255, 69, 0' : 
-                '255, 255, 255'}, 0.4)`
+                '255, 255, 255'}, 0.4)`,
+              borderRadius: '30px'
             }}>
+              {/* Title above the ball - only show when content is loaded */}
+              {!isLoading && generatedSummary && (
+                <h2 className="text-3xl font-bold mb-6 capitalize font-serif text-white" style={{
+                  textShadow: "0px 2px 4px rgba(0,0,0,0.3)"
+                }}>Your Emotional State</h2>
+              )}
+              
               {/* Ball content */}
               <div className="rounded-full mb-6 relative overflow-hidden" style={{
-                width: '150px',
-                height: '150px',
+                width: '180px',
+                height: '180px',
                 background: isLoading || !generatedImage ? 
                   `radial-gradient(circle at 30% 30%, ${selectedBall.color}, ${selectedBall.gradientColor})` : 
                   'none',
-                boxShadow: 'inset 0 0 30px 15px rgba(255, 255, 255, 0.3)'
+                boxShadow: 'inset 0 0 30px 15px rgba(255, 255, 255, 0.3), 0 0 20px 5px rgba(255, 255, 255, 0.2)',
+                border: '4px solid rgba(255, 255, 255, 0.3)'
               }}>
                 {/* Loading spinner */}
                 {isLoading && (
@@ -385,9 +401,16 @@ export default function FifthRowBall() {
                         e.target.src = "/main.png"; // Fallback image
                       }}
                     />
-                    {/* Overlay to maintain the ball's shine effect */}
+                    {/* Glass effect overlay */}
                     <div className="absolute inset-0 rounded-full" style={{
-                      background: 'radial-gradient(circle at 30% 30%, transparent 80%, rgba(255,255,255,0.3))',
+                      background: 'radial-gradient(circle at 30% 30%, transparent 60%, rgba(255,255,255,0.4) 100%)',
+                      mixBlendMode: 'overlay'
+                    }}/>
+                    {/* Additional shine effect */}
+                    <div className="absolute rounded-full" style={{
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%)',
                       mixBlendMode: 'overlay'
                     }}/>
                   </div>
@@ -406,29 +429,76 @@ export default function FifthRowBall() {
                     zIndex: 10
                   }}
                 />
+                
+                {/* Secondary smaller shine */}
+                <div 
+                  className="absolute rounded-full bg-white opacity-60"
+                  style={{
+                    width: '25px',
+                    height: '25px',
+                    bottom: '40px',
+                    right: '35px',
+                    background: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%)',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                  }}
+                />
+                
+                {/* Edge highlight */}
+                <div className="absolute inset-0 rounded-full border-2 border-white opacity-20 pointer-events-none"></div>
               </div>
               
               {/* Story text */}
-              <div className="text-white text-center max-w-md">
+              <div className="text-white text-center max-w-md bg-black bg-opacity-20 p-6 rounded-3xl backdrop-blur-sm">
                 {isLoading ? (
-                  <p className="text-lg italic">Analyzing emotional state...</p>
+                  <div className="py-4">
+                    <h3 className="text-2xl font-serif mb-3">Processing Memory</h3>
+                    <p className="text-lg italic font-light mb-2">Analyzing emotional patterns...</p>
+                    <p className="text-md opacity-70 font-light">Extracting core feelings and experiences from your memory orb</p>
+                    <div className="mt-4 flex justify-center">
+                      <div className="animate-pulse flex space-x-2">
+                        <div className="h-2 w-2 bg-white rounded-full"></div>
+                        <div className="h-2 w-2 bg-white rounded-full animation-delay-200"></div>
+                        <div className="h-2 w-2 bg-white rounded-full animation-delay-400"></div>
+                      </div>
+                    </div>
+                  </div>
                 ) : generatedSummary ? (
                   <>
-                    <h2 className="text-2xl font-bold mb-4 capitalize">Your Emotional State</h2>
-                    <p className="text-lg mb-6">{generatedSummary}</p>
+                    <p className="text-lg mb-6 font-light leading-relaxed tracking-wide"
+                       style={{
+                         fontFamily: "'Georgia', serif",
+                         textShadow: "0px 1px 2px rgba(0,0,0,0.2)",
+                         lineHeight: "1.8"
+                       }}>
+                      {generatedSummary}
+                    </p>
+                    {selectedBall.date && selectedBall.time && (
+                      <div className="text-sm opacity-80 mt-4 border-t border-white border-opacity-30 pt-4 font-mono">
+                        <p>Memory recorded on {selectedBall.date} at {selectedBall.time}</p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
-                    <h2 className="text-2xl font-bold mb-4 capitalize">{selectedBall.name}</h2>
+                    <h2 className="text-2xl font-bold mb-4 capitalize font-serif">{selectedBall.name}</h2>
                     <p className="text-lg mb-6">{selectedBall.story}</p>
+                    {selectedBall.date && selectedBall.time && (
+                      <div className="text-sm opacity-80 mt-2 border-t border-white border-opacity-30 pt-3 font-mono">
+                        <p>Memory recorded on {selectedBall.date} at {selectedBall.time}</p>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
               
               {/* Close button */}
               <button 
-                className="absolute top-4 right-4 text-white hover:text-gray-300"
+                className="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-30 rounded-full p-2"
                 onClick={closeModal}
+                style={{
+                  backdropFilter: "blur(4px)"
+                }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
