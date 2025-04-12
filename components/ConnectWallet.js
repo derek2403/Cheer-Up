@@ -159,8 +159,8 @@ export const ConnectWallet = () => {
     if (signedAccountId) {
       setAction(() => signOut);
       // Truncate long wallet addresses to prevent overflow
-      const displayName = signedAccountId.length > 15 
-        ? `${signedAccountId.slice(0, 7)}...${signedAccountId.slice(-5)}`
+      const displayName = signedAccountId.length > 14 
+        ? `${signedAccountId.slice(0, 6)}...${signedAccountId.slice(-5)}`
         : signedAccountId;
       setLabel(`Logout ${displayName}`);
       
@@ -192,6 +192,16 @@ export const ConnectWallet = () => {
   // Client-side render
   return (
     <div className="flex items-center gap-2">
+      {/* For non-subscribed users, show a subscribe button after login */}
+      {isLoggedIn && !isSubscribed && (
+        <button 
+          onClick={() => setShowSubscriptionPopup(true)}
+          className="mr-2 text-base px-5 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-full transition-colors font-medium hover:shadow-sm border border-gray-200 transform hover:-translate-y-0.5"
+        >
+          Subscribe
+        </button>
+      )}
+
       <button
         onClick={action}
         className="flex items-center justify-center gap-3 py-2 px-5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300 text-base font-semibold text-white border border-blue-400 hover:border-blue-500 transform hover:-translate-y-0.5"
@@ -215,16 +225,6 @@ export const ConnectWallet = () => {
           </>
         )}
       </button>
-
-      {/* For non-subscribed users, show a subscribe button after login */}
-      {isLoggedIn && !isSubscribed && (
-        <button 
-          onClick={() => setShowSubscriptionPopup(true)}
-          className="ml-2 text-sm px-4 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition-colors font-medium hover:shadow-sm border border-blue-200 transform hover:-translate-y-0.5 hover:border-blue-300"
-        >
-          Subscribe
-        </button>
-      )}
 
       {/* Subscription popup - use Portal component to ensure proper positioning */}
       {showSubscriptionPopup && (
