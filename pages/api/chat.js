@@ -1,6 +1,9 @@
 import fetch from 'node-fetch';
 import OpenAI from 'openai';
 import qdrantClient from '../../utils/qdrantClient';
+import fs from 'fs';
+import path from 'path';
+import { promises as fsPromises } from 'fs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -199,6 +202,45 @@ Remember to conclude your response with an invitation for further discussion, re
 
     // Log the response structure for debugging
     console.log('API Response Structure:', JSON.stringify(completion, null, 2));
+
+    // Store the conversation in chat.json
+    // Create directory if it doesn't exist
+    const msgDir = path.join(process.cwd(), 'data', 'msg');
+    try {
+      await fsPromises.mkdir(msgDir, { recursive: true });
+    } catch (err) {
+      console.error("Error creating message directory:", err);
+    }
+
+    const chatFilePath = path.join(msgDir, 'chat.json');
+    
+    // Read existing chat history or create new one
+    let chatHistory = [];
+    try {
+      const fileExists = await fsPromises.access(chatFilePath).then(() => true).catch(() => false);
+      if (fileExists) {
+        const fileContent = await fsPromises.readFile(chatFilePath, 'utf8');
+        chatHistory = JSON.parse(fileContent);
+      }
+    } catch (err) {
+      console.error("Error reading chat history:", err);
+    }
+
+    // Add new messages to chat history
+    const timestamp = new Date().toISOString();
+    chatHistory.push({
+      timestamp,
+      user: query,
+      assistant: answer
+    });
+
+    // Save updated chat history
+    try {
+      await fsPromises.writeFile(chatFilePath, JSON.stringify(chatHistory, null, 2), 'utf8');
+      console.log(`Chat history saved to ${chatFilePath}`);
+    } catch (err) {
+      console.error("Error saving chat history:", err);
+    }
 
     // 7. Return the answer
     return res.status(200).json({ answer });
