@@ -6,6 +6,7 @@ import { useGLTF, OrbitControls, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import Yellow from '../components/yellow';
 import FifthRowBall from '../components/fifthrowball';
+import Header from '../components/header';
 
 // 3D Model component for the ball
 function BallModel({ position = [0, 0, 0] }) {
@@ -52,7 +53,11 @@ export default function Rack() {
         <title>Rack</title>
       </Head>
 
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+      <Header />
+
+      <div className="h-24"></div>
+
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center pt-16">
         
         {/* Rack container with animation */}
         <div 

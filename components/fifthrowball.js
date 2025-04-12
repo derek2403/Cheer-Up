@@ -327,17 +327,6 @@ export default function FifthRowBall() {
                 <p className="text-lg mb-6">{selectedBall.story}</p>
                 
                 {/* Continue button */}
-                <button 
-                  className="px-6 py-2 bg-white text-gray-800 rounded-full font-bold hover:bg-gray-200 transition-colors"
-                  onClick={() => {
-                    closeModal();
-                    setTimeout(() => {
-                      router.push('/corememories');
-                    }, 500);
-                  }}
-                >
-                  Continue to Core Memories
-                </button>
               </div>
               
               {/* Close button */}
