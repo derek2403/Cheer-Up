@@ -128,6 +128,10 @@ export default function ChatbotPage() {
           animation: zoomIn 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
         }
 
+        .${styles.main} {
+          margin-top: 80px; /* Add spacing below header */
+        }
+
         .modal-overlay {
           position: fixed;
           top: 0;
