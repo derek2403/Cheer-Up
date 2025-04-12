@@ -8,7 +8,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
 - Upload and parse therapeutic content (PDF, PNG, JPG)
 - Support for psychological research papers, therapeutic techniques, clinical guidelines
 - Automatic embedding generation using Upstage API
-- Vector storage in Pinecone for semantic search
+- Vector storage for semantic search using Qdrant
 - Dark theme UI for better readability
 
 ### Therapeutic Conversation
@@ -37,6 +37,8 @@ A Next.js application that provides compassionate, evidence-based mental health 
 │   │   └── delete-vectors.js # Vector cleanup
 │   ├── document-chat.js    # Therapeutic conversation interface
 │   └── index.js           # Landing page
+├── utils/
+│   └── qdrantClient.js    # Vector database client
 ├── .env.example           # Environment template
 └── .env.local            # Local environment vars
 ```
@@ -54,7 +56,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
    - Parsed HTML is split into meaningful chunks
    - Special handling for different content types (therapeutic techniques, research findings, etc.)
    - Each chunk is embedded using Upstage Embedding API
-   - Embeddings are stored in Pinecone with metadata
+   - Embeddings are stored in the vector database with metadata
 
 ### Therapeutic Conversation Pipeline
 
@@ -90,18 +92,14 @@ A Next.js application that provides compassionate, evidence-based mental health 
 3. Create a `.env.local` file:
    ```
    UPSTAGE_API_KEY=your_upstage_api_key
-   PINECONE_API_KEY=your_pinecone_api_key
-   PINECONE_INDEX_NAME=your_index_name
    OPENAI_API_KEY=your_openai_api_key
    REDPILL_API_KEY=your_redpill_api_key
    ```
 
-4. Create a Pinecone index:
-   - Sign up for Pinecone
-   - Create index with:
-     - Dimension: 4096 (matches Upstage embedding model)
-     - Metric: Cosine
-     - Type: Dense
+4. Set up Qdrant (locally or cloud):
+   - Install Qdrant locally or use Qdrant Cloud
+   - Configure connection in `utils/qdrantClient.js`
+   - Collection will be initialized automatically
 
 5. Run the development server:
    ```bash
@@ -148,7 +146,7 @@ A Next.js application that provides compassionate, evidence-based mental health 
    - Temperature: 0.4 (balanced for empathy and accuracy)
    - Optimized for therapeutic conversation
 
-5. **Pinecone Vector Database**
+5. **Qdrant Vector Database**
    - Dense vector storage
    - Dimension: 4096
    - Distance: Cosine similarity
