@@ -249,7 +249,7 @@
 
   /* Title and subtitle styles */
   .title {
-    font-size: 3.5rem;
+    font-size: 5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     font-family: 'Space Grotesk', sans-serif;
@@ -260,9 +260,9 @@
   }
 
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     color: #555;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     font-family: 'Quicksand', sans-serif;
     font-weight: 400;
     text-align: center;
