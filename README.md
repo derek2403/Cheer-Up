@@ -199,6 +199,30 @@ Together, these studies underscore that gamification is not just an add-on but a
 
 ---
 
+
+## How to Run This Project 🚀
+
+### Prerequisites
+- Node.js (v14+ recommended)
+- Docker & Docker Compose installed
+- A valid `.env` file in the project root containing all required API keys and configuration settings
+
+### Installation Steps
+
+1. git clone https://github.com/derek2403/CureMeBaby.git
+2. cd CureMeBaby
+3. npm install --legacy-peer-deps
+4. npm run dev
+
+The app will be accessible at http://localhost:3000. Open a new terminal, navigate to the scripts/ directory, and run:
+1. cd scripts
+2. docker-compose up
+
+ 
+
+
+
+
 ## Important Code Directories 📂
 
 Here's a quick reference to the major directories and files in this project, along with their purposes:
