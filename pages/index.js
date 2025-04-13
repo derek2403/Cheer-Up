@@ -8,11 +8,18 @@ export default function Home() {
 
   useEffect(() => {
     setIsLoaded(true);
+    
+    // Initialize particles.js
+    if (typeof window !== 'undefined' && window.particlesJS) {
+      window.particlesJS.load('particles-js', '/assets/particles.json', function() {
+        console.log('particles.js loaded - callback');
+      });
+    }
   }, []);
 
   // Function to duplicate company logos for smooth infinite scrolling
   const createMarqueeItems = (logos) => {
-    return [...logos, ...logos]; // Duplicate the logos for smooth looping
+    return [...logos, ...logos];
   };
 
   // Company logos data
@@ -32,7 +39,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
       </Head>
+
+      <div id="particles-js" className={styles.particlesContainer}></div>
 
       <main className={`${styles.main} ${isLoaded ? styles.loaded : ''}`}>
         <div className={styles.mainContent}>
