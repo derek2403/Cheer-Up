@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Space Grotesk', 'sans-serif'],
+      },
       keyframes: {
         fadeIn: {
           '0%': { opacity: 0, transform: 'scale(0.95)' },
